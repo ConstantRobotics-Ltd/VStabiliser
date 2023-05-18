@@ -56,8 +56,8 @@ enum class VStabiliserParam
     /// 0 - Stabilisation off. The library should just copy input image.
     /// 1 - Stabilisation on.
     MODE,
-    /// Trasparent border mode:
-    /// 0 - Not trasparent borders (black borders).
+    /// Transparent border mode:
+    /// 0 - Not transparent borders (black borders).
     /// 1 - Trasparent borders (parts of previous images).
     /// Particular implementation can have additional modes.
     TRANSPARENT_BORDER,
@@ -70,13 +70,13 @@ enum class VStabiliserParam
     /// Constant rotational angle in degree. The library should add this
     /// offset to each processed video frame.
     CONST_A_OFFSET,
-    /// Instant (fo one frame) horizontal image offset in pixels. The library
+    /// Instant (for one frame) horizontal image offset in pixels. The library
     /// should add this offset to next processed video frame.
     INSTANT_X_OFFSET,
-    /// Instant (fo one frame) vertical image offset in pixels. The library
+    /// Instant (for one frame) vertical image offset in pixels. The library
     /// should add this offset to next processed video frame.
     INSTANT_Y_OFFSET,
-    /// Instant (fo one frame) rotational angle in degree. The library
+    /// Instant (for one frame) rotational angle in degree. The library
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
@@ -142,7 +142,7 @@ public:
      * @brief Stabilise video frame.
      * @param src Source vidoe frame.
      * @param dst Result video frame.
-     * @return TRUE if video frame processed or FALSe in case any errors.
+     * @return TRUE if video frame processed or FALSE in case any errors.
      */
     virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
