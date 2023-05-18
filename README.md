@@ -2,7 +2,7 @@
 
 # VStabiliser interface C++ class
 
-**v1.0.0**
+**v1.1.0**
 
 ------
 
@@ -17,8 +17,6 @@
   - [getParam method](#getParam-method)
   - [executeCommand method](#executeCommand-method)
   - [stabilise method](#stabilise-method)
-  - [getOffsets methods](#getOffsets-methods)
-
 - [Data structures](#Data-structures)
   - [VStabiliserParam enum](#VStabiliserParam-enum)
   - [VStabiliserCommand enum](#VStabiliserCommand-enum)
@@ -32,9 +30,10 @@
 
 **Table 1** - Library versions.
 
-| Version | Release date | What's new     |
-| ------- | ------------ | -------------- |
-| 1.0.0   | 18.05.2023   | First version. |
+| Version | Release date | What's new               |
+| ------- | ------------ | ------------------------ |
+| 1.0.0   | 18.05.2023   | First version.           |
+| 1.1.0   | 18.05.2023   | Excluded getOffsets(...) |
 
 # VStabiliser class description
 
@@ -89,15 +88,6 @@ public:
      * @return TRUE if video frame processed or FALSE in case any errors.
      */
     virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
-
-    /**
-     * @brief Get offsets: horithontal, vertical and rotation. The method must
-     * return current offsets which implemented to last processed video frame.
-     * @param dX Horizontal offset.
-     * @param dY Vertical offset.
-     * @param dA Rotational angle.
-     */
-    virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
 };
 }
 }
@@ -175,20 +165,6 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 **Returns:** TRUE if video frame processed or FALSE in case any errors.
 
-## getOffsets methods
-
-**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (degree) implemented to last processed video frame (**stabilise** method). Method declaration:
-
-```cpp
-virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
-```
-
-| Parameter | Description                                                  |
-| --------- | ------------------------------------------------------------ |
-| dX        | Reference to output value of horizontal offset (pixels) implemented to last processed video frame. |
-| dY        | Reference to output value of vertical offset (pixels) implemented to last processed video frame. |
-| dA        | Reference to output value of rotational angle (degree) implemented to last processed video frame. |
-
 # Data structures
 
 ## VStabiliserParam enum
@@ -253,13 +229,16 @@ enum class VStabiliserParam
     /// offset to each processed video frame.
     CONST_A_OFFSET,
     /// Instant (for one frame) horizontal image offset in pixels. The library
-    /// should add this offset to next processed video frame.
+    /// should add this offset to next processed video frame. After processing
+    /// next video frame this will show current offset for video frame.
     INSTANT_X_OFFSET,
     /// Instant (for one frame) vertical image offset in pixels. The library
-    /// should add this offset to next processed video frame.
+    /// should add this offset to next processed video frame. After processing
+    /// next video frame this will show current offset for video frame.
     INSTANT_Y_OFFSET,
     /// Instant (for one frame) rotational angle in degree. The library
-    /// should add this offset to next processed video frame.
+    /// should add this offset to next processed video frame. After processing
+    /// next video frame this will show current offset for video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
     /// 0 - 2D. Stabilisation only on horizonatal and vertical directions.
@@ -285,9 +264,9 @@ enum class VStabiliserParam
 | CONST_X_OFFSET     | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
 | CONST_Y_OFFSET     | Constant vertical image offset in pixels. The library should add this offset to each processed video frame. |
 | CONST_A_OFFSET     | Constant rotational angle in degree. The library should add this offset to each processed video frame. |
-| INSTANT_X_OFFSET   | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. |
-| INSTANT_Y_OFFSET   | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. |
-| INSTANT_A_OFFSET   | Instant (for one frame) rotational angle in degree. The library should add this offset to next processed video frame. |
+| INSTANT_X_OFFSET   | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. After processing next video frame this will show current offset for video frame. |
+| INSTANT_Y_OFFSET   | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. After processing next video frame this will show current offset for video frame. |
+| INSTANT_A_OFFSET   | Instant (for one frame) rotational angle in degree. The library should add this offset to next processed video frame. After processing next video frame this will show current offset for video frame. |
 | TYPE               | Algorithm type. Particular implementation can have unique values. Default values:<br/>0 - 2D. Stabilisation only on horizonatal and vertical directions.<br/>1 - 3D. Stabilisation on horizontal and vertical directions + rotation. |
 
 ## VStabiliserCommand enum
