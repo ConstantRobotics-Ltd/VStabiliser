@@ -42,7 +42,8 @@ cr::vstab::VStabiliserParams &cr::vstab::VStabiliserParams::operator= (const cr:
 
 
 
-void cr::vstab::VStabiliserParams::encode(uint8_t* data, int& size)
+void cr::vstab::VStabiliserParams::encode(
+        uint8_t* data, int& size, cr::vstab::VStabiliserParamsMask* mask)
 {
     // Encode version.
     int pos = 0;
@@ -50,26 +51,143 @@ void cr::vstab::VStabiliserParams::encode(uint8_t* data, int& size)
     data[pos] = VSTABILISER_MAJOR_VERSION; pos += 1;
     data[pos] = VSTABILISER_MINOR_VERSION; pos += 1;
 
-    // Encode data.
-    memcpy(&data[pos], &scaleFactor, 4); pos += 4;
-    memcpy(&data[pos], &xOffsetLimit, 4); pos += 4;
-    memcpy(&data[pos], &yOffsetLimit, 4); pos += 4;
-    memcpy(&data[pos], &aOffsetLimit, 4); pos += 4;
-    memcpy(&data[pos], &xFilterCoeff, 4); pos += 4;
-    memcpy(&data[pos], &yFilterCoeff, 4); pos += 4;
-    memcpy(&data[pos], &aFilterCoeff, 4); pos += 4;
-    data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
-    data[pos] = trasparentBorder == true ? 0x01 : 0x00; pos += 1;
-    memcpy(&data[pos], &constXOffset, 4); pos += 4;
-    memcpy(&data[pos], &constYOffset, 4); pos += 4;
-    memcpy(&data[pos], &constAOffset, 4); pos += 4;
-    memcpy(&data[pos], &instantXOffset, 4); pos += 4;
-    memcpy(&data[pos], &instantYOffset, 4); pos += 4;
-    memcpy(&data[pos], &instantAOffset, 4); pos += 4;
-    memcpy(&data[pos], &type, 4); pos += 4;
-    memcpy(&data[pos], &cutFrequencyHz, 4); pos += 4;
-    memcpy(&data[pos], &fps, 4); pos += 4;
-    memcpy(&data[pos], &processingTimeMks, 4); pos += 4;
+    // Prepare mask.
+    if (mask == nullptr)
+    {
+        // Prepare mask.
+        data[pos] = 0xFF; pos += 1;
+        data[pos] = 0xFF; pos += 1;
+        data[pos] = 0xFF; pos += 1;
+
+        // Encode data.
+        memcpy(&data[pos], &scaleFactor, 4); pos += 4;
+        memcpy(&data[pos], &xOffsetLimit, 4); pos += 4;
+        memcpy(&data[pos], &yOffsetLimit, 4); pos += 4;
+        memcpy(&data[pos], &aOffsetLimit, 4); pos += 4;
+        memcpy(&data[pos], &xFilterCoeff, 4); pos += 4;
+        memcpy(&data[pos], &yFilterCoeff, 4); pos += 4;
+        memcpy(&data[pos], &aFilterCoeff, 4); pos += 4;
+        data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
+        data[pos] = trasparentBorder == true ? 0x01 : 0x00; pos += 1;
+        memcpy(&data[pos], &constXOffset, 4); pos += 4;
+        memcpy(&data[pos], &constYOffset, 4); pos += 4;
+        memcpy(&data[pos], &constAOffset, 4); pos += 4;
+        memcpy(&data[pos], &instantXOffset, 4); pos += 4;
+        memcpy(&data[pos], &instantYOffset, 4); pos += 4;
+        memcpy(&data[pos], &instantAOffset, 4); pos += 4;
+        memcpy(&data[pos], &type, 4); pos += 4;
+        memcpy(&data[pos], &cutFrequencyHz, 4); pos += 4;
+        memcpy(&data[pos], &fps, 4); pos += 4;
+        memcpy(&data[pos], &processingTimeMks, 4); pos += 4;
+
+        size = pos;
+
+        return;
+    }
+
+    // Prepare mask.
+    data[pos] = 0;
+    data[pos] = data[pos] | (mask->scaleFactor ? (uint8_t)128 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->xOffsetLimit ? (uint8_t)64 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->yOffsetLimit ? (uint8_t)32 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->aOffsetLimit ? (uint8_t)16 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->xFilterCoeff ? (uint8_t)8 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->yFilterCoeff ? (uint8_t)4 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->aFilterCoeff ? (uint8_t)2 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->enable ? (uint8_t)1 : (uint8_t)0);
+    pos += 1;
+    data[pos] = 0;
+    data[pos] = data[pos] | (mask->trasparentBorder ? (uint8_t)128 :(uint8_t)0);
+    data[pos] = data[pos] | (mask->constXOffset ? (uint8_t)64 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->constYOffset ? (uint8_t)32 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->constAOffset ? (uint8_t)16 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->instantXOffset ? (uint8_t)8 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->instantYOffset ? (uint8_t)4 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->instantAOffset ? (uint8_t)2 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->type ? (uint8_t)1 : (uint8_t)0);
+    pos += 1;
+    data[pos] = 0;
+    data[pos] = data[pos] | (mask->cutFrequencyHz ? (uint8_t)128 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->fps ? (uint8_t)64 : (uint8_t)0);
+    data[pos] = data[pos] | (mask->processingTimeMks ? (uint8_t)32 :(uint8_t)0);
+    pos += 1;
+
+    if (mask->scaleFactor)
+    {
+        memcpy(&data[pos], &scaleFactor, 4); pos += 4;
+    }
+    if (mask->xOffsetLimit)
+    {
+        memcpy(&data[pos], &xOffsetLimit, 4); pos += 4;
+    }
+    if (mask->yOffsetLimit)
+    {
+        memcpy(&data[pos], &yOffsetLimit, 4); pos += 4;
+    }
+    if (mask->aOffsetLimit)
+    {
+        memcpy(&data[pos], &aOffsetLimit, 4); pos += 4;
+    }
+    if (mask->xFilterCoeff)
+    {
+        memcpy(&data[pos], &xFilterCoeff, 4); pos += 4;
+    }
+    if (mask->yFilterCoeff)
+    {
+        memcpy(&data[pos], &yFilterCoeff, 4); pos += 4;
+    }
+    if (mask->aFilterCoeff)
+    {
+        memcpy(&data[pos], &aFilterCoeff, 4); pos += 4;
+    }
+    if (mask->enable)
+    {
+        data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
+    }
+    if (mask->trasparentBorder)
+    {
+        data[pos] = trasparentBorder == true ? 0x01 : 0x00; pos += 1;
+    }
+    if (mask->constXOffset)
+    {
+        memcpy(&data[pos], &constXOffset, 4); pos += 4;
+    }
+    if (mask->constYOffset)
+    {
+        memcpy(&data[pos], &constYOffset, 4); pos += 4;
+    }
+    if (mask->constAOffset)
+    {
+        memcpy(&data[pos], &constAOffset, 4); pos += 4;
+    }
+    if (mask->instantXOffset)
+    {
+        memcpy(&data[pos], &instantXOffset, 4); pos += 4;
+    }
+    if (mask->instantYOffset)
+    {
+        memcpy(&data[pos], &instantYOffset, 4); pos += 4;
+    }
+    if (mask->instantAOffset)
+    {
+        memcpy(&data[pos], &instantAOffset, 4); pos += 4;
+    }
+    if (mask->type)
+    {
+        memcpy(&data[pos], &type, 4); pos += 4;
+    }
+    if (mask->cutFrequencyHz)
+    {
+        memcpy(&data[pos], &cutFrequencyHz, 4); pos += 4;
+    }
+    if (mask->fps)
+    {
+        memcpy(&data[pos], &fps, 4); pos += 4;
+    }
+    if (mask->processingTimeMks)
+    {
+        memcpy(&data[pos], &processingTimeMks, 4); pos += 4;
+    }
 
     size = pos;
 }
@@ -87,27 +205,163 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
         data[2] != VSTABILISER_MINOR_VERSION)
         return false;
 
-    // Decode data.
-    int pos = 3;
-    memcpy(&scaleFactor, &data[pos], 4); pos += 4;
-    memcpy(&xOffsetLimit, &data[pos], 4); pos += 4;
-    memcpy(&yOffsetLimit, &data[pos], 4); pos += 4;
-    memcpy(&aOffsetLimit, &data[pos], 4); pos += 4;
-    memcpy(&xFilterCoeff, &data[pos], 4); pos += 4;
-    memcpy(&yFilterCoeff, &data[pos], 4); pos += 4;
-    memcpy(&aFilterCoeff, &data[pos], 4); pos += 4;
-    enable = data[pos] == 0x00 ? false : true; pos += 1;
-    trasparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
-    memcpy(&constXOffset, &data[pos], 4); pos += 4;
-    memcpy(&constYOffset, &data[pos], 4); pos += 4;
-    memcpy(&constAOffset, &data[pos], 4); pos += 4;
-    memcpy(&instantXOffset, &data[pos], 4); pos += 4;
-    memcpy(&instantYOffset, &data[pos], 4); pos += 4;
-    memcpy(&instantAOffset, &data[pos], 4); pos += 4;
-    memcpy(&type, &data[pos], 4); pos += 4;
-    memcpy(&cutFrequencyHz, &data[pos], 4); pos += 4;
-    memcpy(&fps, &data[pos], 4); pos += 4;
-    memcpy(&processingTimeMks, &data[pos], 4);
+    int pos = 6;
+    if ((data[3] & (uint8_t)128) == (uint8_t)128)
+    {
+        memcpy(&scaleFactor, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        scaleFactor = 0;
+    }
+    if ((data[3] & (uint8_t)64) == (uint8_t)64)
+    {
+        memcpy(&xOffsetLimit, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        xOffsetLimit = 0;
+    }
+    if ((data[3] & (uint8_t)32) == (uint8_t)32)
+    {
+        memcpy(&yOffsetLimit, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        yOffsetLimit = 0;
+    }
+    if ((data[3] & (uint8_t)16) == (uint8_t)16)
+    {
+        memcpy(&aOffsetLimit, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        aOffsetLimit = 0.0f;
+    }
+    if ((data[3] & (uint8_t)8) == (uint8_t)8)
+    {
+        memcpy(&xFilterCoeff, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        xFilterCoeff = 0.0f;
+    }
+    if ((data[3] & (uint8_t)4) == (uint8_t)4)
+    {
+        memcpy(&yFilterCoeff, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        yFilterCoeff = 0.0f;
+    }
+    if ((data[3] & (uint8_t)2) == (uint8_t)2)
+    {
+        memcpy(&aFilterCoeff, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        aFilterCoeff = 0.0f;
+    }
+    if ((data[3] & (uint8_t)1) == (uint8_t)1)
+    {
+        enable = data[pos] == 0x00 ? false : true; pos += 1;
+    }
+    else
+    {
+        enable = false;
+    }
+
+
+    if ((data[4] & (uint8_t)128) == (uint8_t)128)
+    {
+        trasparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
+    }
+    else
+    {
+        trasparentBorder = false;
+    }
+    if ((data[4] & (uint8_t)64) == (uint8_t)64)
+    {
+        memcpy(&constXOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        constXOffset = 0;
+    }
+    if ((data[4] & (uint8_t)32) == (uint8_t)32)
+    {
+        memcpy(&constYOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        constYOffset = 0;
+    }
+    if ((data[4] & (uint8_t)16) == (uint8_t)16)
+    {
+        memcpy(&constAOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        constAOffset = 0.0f;
+    }
+    if ((data[4] & (uint8_t)8) == (uint8_t)8)
+    {
+        memcpy(&instantXOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        instantXOffset = 0;
+    }
+    if ((data[4] & (uint8_t)4) == (uint8_t)4)
+    {
+        memcpy(&instantYOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        instantYOffset = 0;
+    }
+    if ((data[4] & (uint8_t)2) == (uint8_t)2)
+    {
+        memcpy(&instantAOffset, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        instantAOffset = 0.0f;
+    }
+    if ((data[4] & (uint8_t)1) == (uint8_t)1)
+    {
+        memcpy(&type, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        type = 0;
+    }
+
+
+    if ((data[4] & (uint8_t)128) == (uint8_t)128)
+    {
+        memcpy(&cutFrequencyHz, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        cutFrequencyHz = 0.0f;
+    }
+    if ((data[4] & (uint8_t)64) == (uint8_t)64)
+    {
+        memcpy(&fps, &data[pos], 4); pos += 4;
+    }
+    else
+    {
+        fps = 0.0f;
+    }
+    if ((data[4] & (uint8_t)32) == (uint8_t)32)
+    {
+        memcpy(&processingTimeMks, &data[pos], 4);
+    }
+    else
+    {
+        processingTimeMks = 0;
+    }
 
     return true;
 }

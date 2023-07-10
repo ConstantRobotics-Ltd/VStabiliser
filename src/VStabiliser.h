@@ -13,6 +13,34 @@ namespace cr
 namespace vstab
 {
 /**
+ * @brief Video stabilizer params mask. Used to serialize VStabiliserParams.
+ */
+typedef struct VStabiliserParamsMask
+{
+    bool scaleFactor{true};
+    bool xOffsetLimit{true};
+    bool yOffsetLimit{true};
+    bool aOffsetLimit{true};
+    bool xFilterCoeff{true};
+    bool yFilterCoeff{true};
+    bool aFilterCoeff{true};
+    bool enable{true};
+    bool trasparentBorder{true};
+    bool constXOffset{true};
+    bool constYOffset{true};
+    bool constAOffset{true};
+    bool instantXOffset{false};
+    bool instantYOffset{false};
+    bool instantAOffset{false};
+    bool type{true};
+    bool cutFrequencyHz{true};
+    bool fps{true};
+    bool processingTimeMks{true};
+} VStabiliserParamsMask;
+
+
+
+/**
  * @brief Video stabilizer params class.
  */
 class VStabiliserParams
@@ -119,8 +147,9 @@ public:
      * @brief Encode params.
      * @param data Pointer to data buffer.
      * @param size Size of data.
+     * @param mask Pointer to params mask to include in data.
      */
-    void encode(uint8_t* data, int& size);
+    void encode(uint8_t* data, int& size, VStabiliserParamsMask* mask = nullptr);
 
     /**
      * @brief Decode params.
