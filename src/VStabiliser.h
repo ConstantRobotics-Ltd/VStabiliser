@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include "Frame.h"
+#include "ConfigReader.h"
 
 
 
@@ -12,11 +13,132 @@ namespace cr
 namespace vstab
 {
 /**
+ * @brief Video stabilizer params class.
+ */
+class VStabiliserParams
+{
+public:
+    /// Scale factor. Value depends on implementation. Default:
+    /// If 1 the library will process original frame size, if 2
+    /// the library will scale original frane size by 2, if 3 - by 3.
+    int scaleFactor{1};
+    /// Maximum horizontal image shift in pixels per video frame. If image shift
+    /// bigger than this limit the library should compensate only xOffsetLimit
+    /// shift.
+    int xOffsetLimit{150};
+    /// Maximum vertical image shift in pixels per video frame. If image shift
+    /// bigger than this limit the library should compensate only yOffsetLimit
+    /// shift.
+    int yOffsetLimit{150};
+    /// Maximum rotational image angle in degree per video frame. If image
+    /// absolute rotational angle bigger than this limit the library should
+    /// compensate only aOffsetLimit angle.
+    float aOffsetLimit{10.0f};
+    /// Horizontal smoothing coefficient of constant camera movement. The range
+    /// of values depends on the specific implementation of the stibilisation
+    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
+    /// constant camera motion, video will not be stabilized, 1 - no smoothing
+    /// of constant camera motion (the library will compensate for the current
+    /// picture drift completely without considering constant motion).
+    float xFilterCoeff{0.9f};
+    /// Vertical smoothing coefficient of constant camera movement. The range
+    /// of values depends on the specific implementation of the stibilisation
+    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
+    /// constant camera motion, video will not be stabilized, 1 - no smoothing
+    /// of constant camera motion (the library will compensate for the current
+    /// picture drift completely without considering constant motion).
+    float yFilterCoeff{0.9f};
+    /// Rotational smoothing coefficient of constant camera movement. The range
+    /// of values depends on the specific implementation of the stibilisation
+    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
+    /// constant camera motion, video will not be stabilized, 1 - no smoothing
+    /// of constant camera motion (the library will compensate for the current
+    /// picture drift completely without considering constant motion).
+    float aFilterCoeff{0.9f};
+    /// Enable/disable stabilisation.
+    bool enable{true};
+    /// Enable/disable trasparent borders.
+    bool trasparentBorder{true};
+    /// Constant horizontal image offset in pixels. The library should add this
+    /// offset to each processed video frame.
+    int constXOffset{0};
+    /// Constant vertical image offset in pixels. The library should add this
+    /// offset to each processed video frame.
+    int constYOffset{0};
+    /// Constant rotational angle in degree. The library should add this
+    /// offset to each processed video frame.
+    float constAOffset{0.0f};
+    /// Instant (for one frame) horizontal image offset in pixels. The library
+    /// should add this offset to next processed video frame.
+    int instantXOffset{0};
+    /// Instant (for one frame) vertical image offset in pixels. The library
+    /// should add this offset to next processed video frame.
+    int instantYOffset{0};
+    /// Instant (for one frame) rotational angle in degree. The library
+    /// should add this offset to next processed video frame.
+    float instantAOffset{0.0f};
+    /// Algorithm type. Default values:
+    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
+    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
+    /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
+    /// Particular implementation can have unique values.
+    int type{2};
+    /// Cat frequency, Hz. Stabiliser will block vibrations with frequency
+    /// > cutFrequencyHz.
+    float cutFrequencyHz{2.0f};
+    /// Frames per second of input video.
+    float fps{30.0f};
+    /// Processing time, mks. Processing time for last video frame.
+    int processingTimeMks{0};
+
+    JSON_READABLE(VStabiliserParams,
+                  scaleFactor,
+                  xOffsetLimit,
+                  yOffsetLimit,
+                  aOffsetLimit,
+                  xFilterCoeff,
+                  yFilterCoeff,
+                  aFilterCoeff,
+                  enable,
+                  trasparentBorder,
+                  constXOffset,
+                  constYOffset,
+                  constAOffset,
+                  type,
+                  cutFrequencyHz,
+                  fps);
+
+    /**
+     * @brief operator =
+     * @param src Source object.
+     * @return VStabiliserParams obect.
+     */
+    VStabiliserParams& operator= (const VStabiliserParams& src);
+
+    /**
+     * @brief Encode params.
+     * @param data Pointer to data buffer.
+     * @param size Size of data.
+     */
+    void encode(uint8_t* data, int& size);
+
+    /**
+     * @brief Decode params.
+     * @param data Pointer to data.
+     * @return TRUE is params decoded or FALSE if not.
+     */
+    bool decode(uint8_t* data);
+};
+
+
+
+/**
  * @brief The video stabiliser params enum.
  */
 enum class VStabiliserParam
 {
-    /// Scale factor. If 1 the library will process original frame size, if 2
+    /// Scale factor. Value depends on implementation. Default:
+    /// If 1 the library will process original frame size, if 2
     /// the library will scale original frane size by 2, if 3 - by 3.
     SCALE_FACTOR = 1,
     /// Maximum horizontal image shift in pixels per video frame. If image shift
@@ -80,10 +202,18 @@ enum class VStabiliserParam
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
-    /// 0 - 2D. Stabilisation only on horizonatal and vertical directions.
-    /// 1 - 3D. Stabilisation on horizontal and vertical directions + rotation.
+    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
+    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
+    /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
-    TYPE
+    TYPE,
+    /// Cat frequency, Hz. Stabiliser will block vibrations with frequency
+    /// > CUT_FREQUENCY_HZ.
+    CUT_FREQUENCY_HZ,
+    /// Frames per second of input video.
+    FPS,
+    /// Processing time, mks. Processing time for last video frame.
+    PROCESSING_TIME_MKS
 };
 
 
@@ -117,26 +247,39 @@ public:
     static std::string getVersion();
 
     /**
+     * @brief Init all video stabiliser params by params structure.
+     * @param params Parameters class.
+     * @return TRUE if params was accepted or FALSE if not.
+     */
+    virtual bool initVStabiliser(VStabiliserParams& params) = 0;
+
+    /**
      * @brief Set param.
      * @param id Param ID.
      * @param value Param value.
      * @return TRUE if param was accepted or FALSE if not.
      */
-    virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
+    virtual bool setParam(VStabiliserParam id, float value) = 0;
 
     /**
      * @brief Get param.
      * @param id Param ID.
      * @return Param value or -1 if this param not supported by implementation.
      */
-    virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
+    virtual float getParam(VStabiliserParam id) = 0;
+
+    /**
+     * @brief Get params.
+     * @return Params class.
+     */
+    virtual VStabiliserParams getParams() = 0;
 
     /**
      * @brief Execute command.
      * @param id Command ID.
      * @return TRUE if the command executed or FALSE if not.
      */
-    virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
+    virtual bool executeCommand(VStabiliserCommand id) = 0;
 
     /**
      * @brief Stabilise video frame.
@@ -154,6 +297,40 @@ public:
      * @param dA Rotational angle.
      */
     virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
+
+    /**
+     * @brief Encode set param command.
+     * @param data Pointer to data buffer. Must have size >= 11.
+     * @param size Size of encoded data.
+     * @param id Parameter id.
+     * @param value Parameter value.
+     */
+    static void encodeSetParamCommand(
+            uint8_t* data, int& size, VStabiliserParam id, float value);
+
+    /**
+     * @brief Encode command.
+     * @param data Pointer to data buffer. Must have size >= 11.
+     * @param size Size of encoded data.
+     * @param id Command ID.
+     */
+    static void encodeCommand(
+            uint8_t* data, int& size, VStabiliserCommand id);
+
+    /**
+     * @brief Decode command.
+     * @param data Pointer to command data.
+     * @param size Size of data.
+     * @param paramId Output command ID.
+     * @param commandId Output command ID.
+     * @param value Param or command value.
+     * @return 0 - command decoded, 1 - set param command decoded, -1 - error.
+     */
+    static int decodeCommand(uint8_t* data,
+                             int size,
+                             VStabiliserParam& paramId,
+                             VStabiliserCommand& commandId,
+                             float& value);
 };
 }
 }

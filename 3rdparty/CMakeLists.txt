@@ -14,8 +14,10 @@ project(3rdparty LANGUAGES CXX)
 ## SETTINGS
 ## basic 3rd-party settings before use
 ################################################################################
+# To inherit the top-level architecture when the project is used as a submodule.
+SET(PARENT ${PARENT}_LENS_3RDPARTY)
 # Disable self-overwriting of parameters inside included subdirectories.
-SET(${PARENT}_SUBMODULE_CACHE_OVERWRITE                 OFF CACHE BOOL "" FORCE)
+SET(${PARENT}_SUBMODULE_CACHE_OVERWRITE OFF CACHE BOOL "" FORCE)
 
 
 
@@ -29,6 +31,12 @@ if (${PARENT}_SUBMODULE_FRAME)
     SET(${PARENT}_FRAME_TEST                            OFF CACHE BOOL "" FORCE)
 endif()
 
+SET(${PARENT}_SUBMODULE_CONFIG_READER                   ON  CACHE BOOL "" FORCE)
+if (${PARENT}_SUBMODULE_CONFIG_READER)
+    SET(${PARENT}_CONFIG_READER                         ON  CACHE BOOL "" FORCE)
+    SET(${PARENT}_CONFIG_READER_EXAMPLES                OFF CACHE BOOL "" FORCE)
+endif()
+
 
 
 ################################################################################
@@ -39,3 +47,6 @@ if (${PARENT}_SUBMODULE_FRAME)
     add_subdirectory(Frame)
 endif()
 
+if (${PARENT}_SUBMODULE_CONFIG_READER)
+    add_subdirectory(ConfigReader)
+endif()

@@ -30,6 +30,7 @@ endif()
 ## project configuration
 ################################################################################
 SET(${PARENT}_VSTABILISER                    ON  CACHE BOOL "" ${REWRITE_FORCE})
+SET(${PARENT}_VSTABILISER_TEST               ON  CACHE BOOL "" ${REWRITE_FORCE})
 
 
 
@@ -40,4 +41,8 @@ SET(${PARENT}_VSTABILISER                    ON  CACHE BOOL "" ${REWRITE_FORCE})
 if (${PARENT}_VSTABILISER)
     add_subdirectory(src)
     add_subdirectory(3rdparty)
+endif()
+
+if (${PARENT}_VSTABILISER_TEST)
+    add_subdirectory(test)
 endif()
