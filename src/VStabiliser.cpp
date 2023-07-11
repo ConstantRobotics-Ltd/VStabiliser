@@ -36,6 +36,7 @@ cr::vstab::VStabiliserParams &cr::vstab::VStabiliserParams::operator= (const cr:
     cutFrequencyHz = src.cutFrequencyHz;
     fps = src.fps;
     processingTimeMks = src.processingTimeMks;
+    logMod = src.logMod;
 
     return *this;
 }
@@ -79,6 +80,7 @@ void cr::vstab::VStabiliserParams::encode(
         memcpy(&data[pos], &cutFrequencyHz, 4); pos += 4;
         memcpy(&data[pos], &fps, 4); pos += 4;
         memcpy(&data[pos], &processingTimeMks, 4); pos += 4;
+        memcpy(&data[pos], &logMod, 4); pos += 4;
 
         size = pos;
 
@@ -110,6 +112,7 @@ void cr::vstab::VStabiliserParams::encode(
     data[pos] = data[pos] | (mask->cutFrequencyHz ? (uint8_t)128 : (uint8_t)0);
     data[pos] = data[pos] | (mask->fps ? (uint8_t)64 : (uint8_t)0);
     data[pos] = data[pos] | (mask->processingTimeMks ? (uint8_t)32 :(uint8_t)0);
+    data[pos] = data[pos] | (mask->logMod ? (uint8_t)16 :(uint8_t)0);
     pos += 1;
 
     if (mask->scaleFactor)
@@ -187,6 +190,10 @@ void cr::vstab::VStabiliserParams::encode(
     if (mask->processingTimeMks)
     {
         memcpy(&data[pos], &processingTimeMks, 4); pos += 4;
+    }
+    if (mask->logMod)
+    {
+        memcpy(&data[pos], &logMod, 4); pos += 4;
     }
 
     size = pos;
@@ -338,7 +345,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
 
 
-    if ((data[4] & (uint8_t)128) == (uint8_t)128)
+    if ((data[5] & (uint8_t)128) == (uint8_t)128)
     {
         memcpy(&cutFrequencyHz, &data[pos], 4); pos += 4;
     }
@@ -346,7 +353,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     {
         cutFrequencyHz = 0.0f;
     }
-    if ((data[4] & (uint8_t)64) == (uint8_t)64)
+    if ((data[5] & (uint8_t)64) == (uint8_t)64)
     {
         memcpy(&fps, &data[pos], 4); pos += 4;
     }
@@ -354,13 +361,21 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     {
         fps = 0.0f;
     }
-    if ((data[4] & (uint8_t)32) == (uint8_t)32)
+    if ((data[5] & (uint8_t)32) == (uint8_t)32)
     {
-        memcpy(&processingTimeMks, &data[pos], 4);
+        memcpy(&processingTimeMks, &data[pos], 4); pos += 4;
     }
     else
     {
         processingTimeMks = 0;
+    }
+    if ((data[5] & (uint8_t)16) == (uint8_t)16)
+    {
+        memcpy(&logMod, &data[pos], 4);
+    }
+    else
+    {
+        logMod = 0;
     }
 
     return true;

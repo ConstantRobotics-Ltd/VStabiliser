@@ -36,6 +36,7 @@ typedef struct VStabiliserParamsMask
     bool cutFrequencyHz{true};
     bool fps{true};
     bool processingTimeMks{true};
+    bool logMod{true};
 } VStabiliserParamsMask;
 
 
@@ -118,6 +119,9 @@ public:
     float fps{30.0f};
     /// Processing time, mks. Processing time for last video frame.
     int processingTimeMks{0};
+    /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
+    /// 3 - File and terminal.
+    int logMod{0};
 
     JSON_READABLE(VStabiliserParams,
                   scaleFactor,
@@ -134,7 +138,8 @@ public:
                   constAOffset,
                   type,
                   cutFrequencyHz,
-                  fps);
+                  fps,
+                  logMod);
 
     /**
      * @brief operator =
@@ -168,7 +173,7 @@ enum class VStabiliserParam
 {
     /// Scale factor. Value depends on implementation. Default:
     /// If 1 the library will process original frame size, if 2
-    /// the library will scale original frane size by 2, if 3 - by 3.
+    /// the library will scale original frame size by 2, if 3 - by 3.
     SCALE_FACTOR = 1,
     /// Maximum horizontal image shift in pixels per video frame. If image shift
     /// bigger than this limit the library should compensate only X_OFFSET_LIMIT
@@ -242,7 +247,10 @@ enum class VStabiliserParam
     /// Frames per second of input video.
     FPS,
     /// Processing time, mks. Processing time for last video frame.
-    PROCESSING_TIME_MKS
+    PROCESSING_TIME_MKS,
+    /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
+    /// 3 - File and terminal.
+    LOG_MODE
 };
 
 

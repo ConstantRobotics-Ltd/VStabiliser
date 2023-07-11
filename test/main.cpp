@@ -100,6 +100,7 @@ bool copyTest()
     in.cutFrequencyHz = rand() % 255;
     in.fps = rand() % 255;
     in.processingTimeMks = rand() % 255;
+    in.logMod = rand() % 255;
 
     // Copy params.
     VStabiliserParams out = in;
@@ -200,6 +201,11 @@ bool copyTest()
         cout << "in.processingTimeMks" << endl;
         return false;
     }
+    if (in.logMod != out.logMod)
+    {
+        cout << "in.logMod" << endl;
+        return false;
+    }
 
     return true;
 }
@@ -230,6 +236,7 @@ bool encodeDecodeTest()
     in.cutFrequencyHz = rand() % 255;
     in.fps = rand() % 255;
     in.processingTimeMks = rand() % 255;
+    in.logMod = rand() % 255;
 
     // Encode data.
     uint8_t data[1024];
@@ -342,6 +349,11 @@ bool encodeDecodeTest()
         cout << "in.processingTimeMks" << endl;
         return false;
     }
+    if (in.logMod != out.logMod)
+    {
+        cout << "in.logMod" << endl;
+        return false;
+    }
 
     return true;
 }
@@ -372,6 +384,7 @@ bool encodeDecodeWithMaskTest()
     in.cutFrequencyHz = rand() % 255;
     in.fps = rand() % 255;
     in.processingTimeMks = rand() % 255;
+    in.logMod = rand() % 255;
 
     // Prepare mask.
     VStabiliserParamsMask mask;
@@ -394,6 +407,7 @@ bool encodeDecodeWithMaskTest()
     mask.cutFrequencyHz = true;
     mask.fps = false;
     mask.processingTimeMks = true;
+    mask.logMod = false;
 
     // Encode data.
     uint8_t data[1024];
@@ -506,6 +520,11 @@ bool encodeDecodeWithMaskTest()
         cout << "in.processingTimeMks" << endl;
         return false;
     }
+    if (out.logMod != 0)
+    {
+        cout << "in.logMod" << endl;
+        return false;
+    }
 
     return true;
 }
@@ -592,6 +611,7 @@ bool jsonReadWriteTest()
     in.cutFrequencyHz = rand() % 255;
     in.fps = rand() % 255;
     in.processingTimeMks = rand() % 255;
+    in.logMod = rand() % 255;
 
     // Write params to file.
     cr::utils::ConfigReader inConfig;
