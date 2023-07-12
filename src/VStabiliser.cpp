@@ -25,7 +25,7 @@ cr::vstab::VStabiliserParams &cr::vstab::VStabiliserParams::operator= (const cr:
     yFilterCoeff = src.yFilterCoeff;
     aFilterCoeff = src.aFilterCoeff;
     enable = src.enable;
-    trasparentBorder = src.trasparentBorder;
+    transparentBorder = src.transparentBorder;
     constXOffset = src.constXOffset;
     constYOffset = src.constYOffset;
     constAOffset = src.constAOffset;
@@ -69,7 +69,7 @@ void cr::vstab::VStabiliserParams::encode(
         memcpy(&data[pos], &yFilterCoeff, 4); pos += 4;
         memcpy(&data[pos], &aFilterCoeff, 4); pos += 4;
         data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
-        data[pos] = trasparentBorder == true ? 0x01 : 0x00; pos += 1;
+        data[pos] = transparentBorder == true ? 0x01 : 0x00; pos += 1;
         memcpy(&data[pos], &constXOffset, 4); pos += 4;
         memcpy(&data[pos], &constYOffset, 4); pos += 4;
         memcpy(&data[pos], &constAOffset, 4); pos += 4;
@@ -99,7 +99,7 @@ void cr::vstab::VStabiliserParams::encode(
     data[pos] = data[pos] | (mask->enable ? (uint8_t)1 : (uint8_t)0);
     pos += 1;
     data[pos] = 0;
-    data[pos] = data[pos] | (mask->trasparentBorder ? (uint8_t)128 :(uint8_t)0);
+    data[pos] = data[pos] | (mask->transparentBorder ? (uint8_t)128 :(uint8_t)0);
     data[pos] = data[pos] | (mask->constXOffset ? (uint8_t)64 : (uint8_t)0);
     data[pos] = data[pos] | (mask->constYOffset ? (uint8_t)32 : (uint8_t)0);
     data[pos] = data[pos] | (mask->constAOffset ? (uint8_t)16 : (uint8_t)0);
@@ -147,9 +147,9 @@ void cr::vstab::VStabiliserParams::encode(
     {
         data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
     }
-    if (mask->trasparentBorder)
+    if (mask->transparentBorder)
     {
-        data[pos] = trasparentBorder == true ? 0x01 : 0x00; pos += 1;
+        data[pos] = transparentBorder == true ? 0x01 : 0x00; pos += 1;
     }
     if (mask->constXOffset)
     {
@@ -281,11 +281,11 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
 
     if ((data[4] & (uint8_t)128) == (uint8_t)128)
     {
-        trasparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
+        transparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
     }
     else
     {
-        trasparentBorder = false;
+        transparentBorder = false;
     }
     if ((data[4] & (uint8_t)64) == (uint8_t)64)
     {

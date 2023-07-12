@@ -84,21 +84,21 @@ bool copyTest()
     in.scaleFactor = rand() % 255;
     in.xOffsetLimit = rand() % 255;
     in.yOffsetLimit = rand() % 255;
-    in.aOffsetLimit = rand() % 255;
-    in.xFilterCoeff = rand() % 255;
-    in.yFilterCoeff = rand() % 255;
-    in.aFilterCoeff = rand() % 255;
+    in.aOffsetLimit = static_cast<float>(rand() % 255);
+    in.xFilterCoeff = static_cast<float>(rand() % 255);
+    in.yFilterCoeff = static_cast<float>(rand() % 255);
+    in.aFilterCoeff = static_cast<float>(rand() % 255);
     in.enable = false;
-    in.trasparentBorder = true;
+    in.transparentBorder = true;
     in.constXOffset = rand() % 255;
     in.constYOffset = rand() % 255;
-    in.constAOffset = rand() % 255;
+    in.constAOffset = static_cast<float>(rand() % 255);
     in.instantXOffset = rand() % 255;
     in.instantYOffset = rand() % 255;
-    in.instantAOffset = rand() % 255;
+    in.instantAOffset = static_cast<float>(rand() % 255);
     in.type = rand() % 255;
-    in.cutFrequencyHz = rand() % 255;
-    in.fps = rand() % 255;
+    in.cutFrequencyHz = static_cast<float>(rand() % 255);
+    in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
 
@@ -146,7 +146,7 @@ bool copyTest()
         cout << "in.enable" << endl;
         return false;
     }
-    if (in.trasparentBorder != out.trasparentBorder)
+    if (in.transparentBorder != out.transparentBorder)
     {
         cout << "in.trasparentBorder" << endl;
         return false;
@@ -220,21 +220,21 @@ bool encodeDecodeTest()
     in.scaleFactor = rand() % 255;
     in.xOffsetLimit = rand() % 255;
     in.yOffsetLimit = rand() % 255;
-    in.aOffsetLimit = rand() % 255;
-    in.xFilterCoeff = rand() % 255;
-    in.yFilterCoeff = rand() % 255;
-    in.aFilterCoeff = rand() % 255;
+    in.aOffsetLimit = static_cast<float>(rand() % 255);
+    in.xFilterCoeff = static_cast<float>(rand() % 255);
+    in.yFilterCoeff = static_cast<float>(rand() % 255);
+    in.aFilterCoeff = static_cast<float>(rand() % 255);
     in.enable = false;
-    in.trasparentBorder = true;
+    in.transparentBorder = true;
     in.constXOffset = rand() % 255;
     in.constYOffset = rand() % 255;
-    in.constAOffset = rand() % 255;
+    in.constAOffset = static_cast<float>(rand() % 255);
     in.instantXOffset = rand() % 255;
     in.instantYOffset = rand() % 255;
-    in.instantAOffset = rand() % 255;
+    in.instantAOffset = static_cast<float>(rand() % 255);
     in.type = rand() % 255;
-    in.cutFrequencyHz = rand() % 255;
-    in.fps = rand() % 255;
+    in.cutFrequencyHz = static_cast<float>(rand() % 255);
+    in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
 
@@ -294,7 +294,7 @@ bool encodeDecodeTest()
         cout << "in.enable" << endl;
         return false;
     }
-    if (in.trasparentBorder != out.trasparentBorder)
+    if (in.transparentBorder != out.transparentBorder)
     {
         cout << "in.trasparentBorder" << endl;
         return false;
@@ -368,21 +368,21 @@ bool encodeDecodeWithMaskTest()
     in.scaleFactor = rand() % 255;
     in.xOffsetLimit = rand() % 255;
     in.yOffsetLimit = rand() % 255;
-    in.aOffsetLimit = rand() % 255;
-    in.xFilterCoeff = rand() % 255;
-    in.yFilterCoeff = rand() % 255;
-    in.aFilterCoeff = rand() % 255;
+    in.aOffsetLimit = static_cast<float>(rand() % 255);
+    in.xFilterCoeff = static_cast<float>(rand() % 255);
+    in.yFilterCoeff = static_cast<float>(rand() % 255);
+    in.aFilterCoeff = static_cast<float>(rand() % 255);
     in.enable = false;
-    in.trasparentBorder = true;
+    in.transparentBorder = true;
     in.constXOffset = rand() % 255;
     in.constYOffset = rand() % 255;
-    in.constAOffset = rand() % 255;
+    in.constAOffset = static_cast<float>(rand() % 255);
     in.instantXOffset = rand() % 255;
     in.instantYOffset = rand() % 255;
-    in.instantAOffset = rand() % 255;
+    in.instantAOffset = static_cast<float>(rand() % 255);
     in.type = rand() % 255;
-    in.cutFrequencyHz = rand() % 255;
-    in.fps = rand() % 255;
+    in.cutFrequencyHz = static_cast<float>(rand() % 255);
+    in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
 
@@ -396,7 +396,7 @@ bool encodeDecodeWithMaskTest()
     mask.yFilterCoeff = false;
     mask.aFilterCoeff = true;
     mask.enable = false;
-    mask.trasparentBorder = true;
+    mask.transparentBorder = true;
     mask.constXOffset = false;
     mask.constYOffset = true;
     mask.constAOffset = false;
@@ -465,7 +465,7 @@ bool encodeDecodeWithMaskTest()
         cout << "in.enable" << endl;
         return false;
     }
-    if (in.trasparentBorder != out.trasparentBorder)
+    if (in.transparentBorder != out.transparentBorder)
     {
         cout << "in.trasparentBorder" << endl;
         return false;
@@ -595,21 +595,21 @@ bool jsonReadWriteTest()
     in.scaleFactor = rand() % 255;
     in.xOffsetLimit = rand() % 255;
     in.yOffsetLimit = rand() % 255;
-    in.aOffsetLimit = rand() % 255;
-    in.xFilterCoeff = rand() % 255;
-    in.yFilterCoeff = rand() % 255;
-    in.aFilterCoeff = rand() % 255;
+    in.aOffsetLimit = static_cast<float>(rand() % 255);
+    in.xFilterCoeff = static_cast<float>(rand() % 255);
+    in.yFilterCoeff = static_cast<float>(rand() % 255);
+    in.aFilterCoeff = static_cast<float>(rand() % 255);
     in.enable = false;
-    in.trasparentBorder = true;
+    in.transparentBorder = true;
     in.constXOffset = rand() % 255;
     in.constYOffset = rand() % 255;
-    in.constAOffset = rand() % 255;
+    in.constAOffset = static_cast<float>(rand() % 255);
     in.instantXOffset = rand() % 255;
     in.instantYOffset = rand() % 255;
-    in.instantAOffset = rand() % 255;
+    in.instantAOffset = static_cast<float>(rand() % 255);
     in.type = rand() % 255;
-    in.cutFrequencyHz = rand() % 255;
-    in.fps = rand() % 255;
+    in.cutFrequencyHz = static_cast<float>(rand() % 255);
+    in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
 
@@ -674,7 +674,7 @@ bool jsonReadWriteTest()
         cout << "in.enable" << endl;
         return false;
     }
-    if (in.trasparentBorder != out.trasparentBorder)
+    if (in.transparentBorder != out.transparentBorder)
     {
         cout << "in.trasparentBorder" << endl;
         return false;

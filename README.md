@@ -2,7 +2,7 @@
 
 # VStabiliser interface C++ class
 
-**v2.0.0**
+**v2.0.1**
 
 ------
 
@@ -52,6 +52,7 @@
 | ------- | ------------ | ------------------------------------------------------------ |
 | 1.0.0   | 18.05.2023   | First version.                                               |
 | 2.0.0   | 11.07.2023   | - Added VStabiliserParams class to keep library parameters.<br />- Added method to encode/decode commands.<br />- Added test application.<br />- Added license.<br />- Repository made public. |
+| 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application <br /> |
 
 
 
@@ -442,7 +443,7 @@ enum class VStabiliserParam
     MODE,
     /// Transparent border mode:
     /// 0 - Not transparent borders (black borders).
-    /// 1 - Trasparent borders (parts of previous images).
+    /// 1 - Transparent borders (parts of previous images).
     /// Particular implementation can have additional modes.
     TRANSPARENT_BORDER,
     /// Constant horizontal image offset in pixels. The library should add this
@@ -588,8 +589,8 @@ public:
     float aFilterCoeff{0.9f};
     /// Enable/disable stabilisation.
     bool enable{true};
-    /// Enable/disable trasparent borders.
-    bool trasparentBorder{true};
+    /// Enable/disable transparent borders.
+    bool transparentBorder{true};
     /// Constant horizontal image offset in pixels. The library should add this
     /// offset to each processed video frame.
     int constXOffset{0};
@@ -627,7 +628,7 @@ public:
 
     JSON_READABLE(VStabiliserParams, scaleFactor, xOffsetLimit, yOffsetLimit,
                   aOffsetLimit, xFilterCoeff, yFilterCoeff, aFilterCoeff,
-                  enable, trasparentBorder, constXOffset, constYOffset,
+                  enable, transparentBorder, constXOffset, constYOffset,
                   constAOffset, type, cutFrequencyHz, fps, logMod);
 
     /**
@@ -666,7 +667,7 @@ public:
 | yFilterCoeff                            | float | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | aFilterCoeff                            | float | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | enable                                  | bool  | Enable/disable stabilisation.                                |
-| trasparentBorder                        | bool  | Enable/disable trasparent borders.                           |
+| transparentBorder                       | bool  | Enable/disable transparent borders.                          |
 | constXOffset                            | int   | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
 | constYOffset                            | int   | Constant vertical image offset in pixels. The library should add this offset to each processed video frame. |
 | constAOffset                            | float | Constant rotational angle in degree. The library should add this offset to each processed video frame. |
@@ -710,7 +711,7 @@ typedef struct VStabiliserParamsMask
     bool yFilterCoeff{true};
     bool aFilterCoeff{true};
     bool enable{true};
-    bool trasparentBorder{true};
+    bool transparentBorder{true};
     bool constXOffset{true};
     bool constYOffset{true};
     bool constAOffset{true};
@@ -795,7 +796,7 @@ VStabiliserParams in;
 in.scaleFactor = rand() % 255;
 in.xOffsetLimit = rand() % 255;
 in.yOffsetLimit = rand() % 255;
-in.aOffsetLimit = rand() % 255;
+in.aOffsetLimit = static_cast<float>(rand() % 255);
 
 // Write params to file.
 cr::utils::ConfigReader inConfig;
@@ -833,7 +834,7 @@ if(!outConfig.get(out, "VStabiliserParams"))
         "fps": 90.0,
         "logMod": 99,
         "scaleFactor": 53,
-        "trasparentBorder": true,
+        "transparentBorder": true,
         "type": 208,
         "xFilterCoeff": 76.0,
         "xOffsetLimit": 51,

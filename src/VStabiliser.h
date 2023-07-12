@@ -25,7 +25,7 @@ typedef struct VStabiliserParamsMask
     bool yFilterCoeff{true};
     bool aFilterCoeff{true};
     bool enable{true};
-    bool trasparentBorder{true};
+    bool transparentBorder{true};
     bool constXOffset{true};
     bool constYOffset{true};
     bool constAOffset{true};
@@ -87,7 +87,7 @@ public:
     /// Enable/disable stabilisation.
     bool enable{true};
     /// Enable/disable trasparent borders.
-    bool trasparentBorder{true};
+    bool transparentBorder{true};
     /// Constant horizontal image offset in pixels. The library should add this
     /// offset to each processed video frame.
     int constXOffset{0};
@@ -132,7 +132,7 @@ public:
                   yFilterCoeff,
                   aFilterCoeff,
                   enable,
-                  trasparentBorder,
+                  transparentBorder,
                   constXOffset,
                   constYOffset,
                   constAOffset,
