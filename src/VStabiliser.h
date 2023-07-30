@@ -59,7 +59,7 @@ public:
     /// bigger than this limit the library should compensate only yOffsetLimit
     /// shift.
     int yOffsetLimit{150};
-    /// Maximum rotational image angle in degree per video frame. If image
+    /// Maximum rotational image angle in readians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
@@ -94,7 +94,7 @@ public:
     /// Constant vertical image offset in pixels. The library should add this
     /// offset to each processed video frame.
     int constYOffset{0};
-    /// Constant rotational angle in degree. The library should add this
+    /// Constant rotational angle in radians. The library should add this
     /// offset to each processed video frame.
     float constAOffset{0.0f};
     /// Instant (for one frame) horizontal image offset in pixels. The library
@@ -103,7 +103,7 @@ public:
     /// Instant (for one frame) vertical image offset in pixels. The library
     /// should add this offset to next processed video frame.
     int instantYOffset{0};
-    /// Instant (for one frame) rotational angle in degree. The library
+    /// Instant (for one frame) rotational angle in radians. The library
     /// should add this offset to next processed video frame.
     float instantAOffset{0.0f};
     /// Algorithm type. Default values:
@@ -183,7 +183,7 @@ enum class VStabiliserParam
     /// bigger than this limit the library should compensate only Y_OFFSET_LIMIT
     /// shift.
     Y_OFFSET_LIMIT,
-    /// Maximum rotational image angle in degree per video frame. If image
+    /// Maximum rotational image angle in radians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only A_OFFSET_LIMIT angle.
     A_OFFSET_LIMIT,
@@ -223,7 +223,7 @@ enum class VStabiliserParam
     /// Constant vertical image offset in pixels. The library should add this
     /// offset to each processed video frame.
     CONST_Y_OFFSET,
-    /// Constant rotational angle in degree. The library should add this
+    /// Constant rotational angle in radians. The library should add this
     /// offset to each processed video frame.
     CONST_A_OFFSET,
     /// Instant (for one frame) horizontal image offset in pixels. The library
@@ -232,7 +232,7 @@ enum class VStabiliserParam
     /// Instant (for one frame) vertical image offset in pixels. The library
     /// should add this offset to next processed video frame.
     INSTANT_Y_OFFSET,
-    /// Instant (for one frame) rotational angle in degree. The library
+    /// Instant (for one frame) rotational angle in radians. The library
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
@@ -331,7 +331,7 @@ public:
      * return current offsets which implemented to last processed video frame.
      * @param dX Horizontal offset.
      * @param dY Vertical offset.
-     * @param dA Rotational angle.
+     * @param dA Rotational angle, radians.
      */
     virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
 

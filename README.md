@@ -2,7 +2,7 @@
 
 # VStabiliser interface C++ class
 
-**v2.0.1**
+**v2.1.0**
 
 ------
 
@@ -52,7 +52,8 @@
 | ------- | ------------ | ------------------------------------------------------------ |
 | 1.0.0   | 18.05.2023   | First version.                                               |
 | 2.0.0   | 11.07.2023   | - Added VStabiliserParams class to keep library parameters.<br />- Added method to encode/decode commands.<br />- Added test application.<br />- Added license.<br />- Repository made public. |
-| 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application <br /> |
+| 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application. |
+| 2.1.0   | 30.07.2023   | - Switched from radians to radians in params.                |
 
 
 
@@ -113,7 +114,7 @@ public:
      * return current offsets which implemented to last processed video frame.
      * @param dX Horizontal offset.
      * @param dY Vertical offset.
-     * @param dA Rotational angle.
+     * @param dA Rotational angle, radians.
      */
     virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
     /**
@@ -270,7 +271,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 ## getOffsets methods
 
-**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (degree) implemented to last processed video frame (**stabilise** method). Method declaration:
+**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (radians) implemented to last processed video frame (**stabilise** method). Method declaration:
 
 ```cpp
 virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
@@ -280,7 +281,7 @@ virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
 | --------- | ------------------------------------------------------------ |
 | dX        | Reference to output value of horizontal offset (pixels) implemented to last processed video frame. |
 | dY        | Reference to output value of vertical offset (pixels) implemented to last processed video frame. |
-| dA        | Reference to output value of rotational angle (degree) implemented to last processed video frame. |
+| dA        | Reference to output value of rotational angle (radiansee) implemented to last processed video frame. |
 
 
 
@@ -412,7 +413,7 @@ enum class VStabiliserParam
     /// bigger than this limit the library should compensate only Y_OFFSET_LIMIT
     /// shift.
     Y_OFFSET_LIMIT,
-    /// Maximum rotational image angle in degree per video frame. If image
+    /// Maximum rotational image angle in radians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only A_OFFSET_LIMIT angle.
     A_OFFSET_LIMIT,
@@ -452,7 +453,7 @@ enum class VStabiliserParam
     /// Constant vertical image offset in pixels. The library should add this
     /// offset to each processed video frame.
     CONST_Y_OFFSET,
-    /// Constant rotational angle in degree. The library should add this
+    /// Constant rotational angle in radians. The library should add this
     /// offset to each processed video frame.
     CONST_A_OFFSET,
     /// Instant (for one frame) horizontal image offset in pixels. The library
@@ -461,7 +462,7 @@ enum class VStabiliserParam
     /// Instant (for one frame) vertical image offset in pixels. The library
     /// should add this offset to next processed video frame.
     INSTANT_Y_OFFSET,
-    /// Instant (for one frame) rotational angle in degree. The library
+    /// Instant (for one frame) rotational angle in radians. The library
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
@@ -490,7 +491,7 @@ enum class VStabiliserParam
 | SCALE_FACTOR                              | Scale factor. Value depends on implementation. Default: If 1 the library will process original frame size, if 2 the library will scale original frame size by 2, if 3 - by 3. |
 | X_OFFSET_LIMIT                            | Maximum horizontal image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only X_OFFSET_LIMIT shift. |
 | Y_OFFSET_LIMIT                            | Maximum vertical image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only Y_OFFSET_LIMIT shift. |
-| A_OFFSET_LIMIT                            | Maximum rotational image angle in degree per video frame. If image absolute rotational angle bigger than this limit the library should compensate only A_OFFSET_LIMIT angle. |
+| A_OFFSET_LIMIT                            | Maximum rotational image angle in radians per video frame. If image absolute rotational angle bigger than this limit the library should compensate only A_OFFSET_LIMIT angle. |
 | X_FILTER_COEFF                            | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | Y_FILTER_COEFF                            | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | A_FILTER_COEFF                            | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
@@ -498,10 +499,10 @@ enum class VStabiliserParam
 | TRANSPARENT_BORDER                        | Transparent border mode:<br/>0 - Not transparent borders (black borders).<br/>1 - Transparent borders (parts of previous images). Particular implementation can have additional modes. |
 | CONST_X_OFFSET                            | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
 | CONST_Y_OFFSET                            | Constant vertical image offset in pixels. The library should add this offset to each processed video frame. |
-| CONST_A_OFFSET                            | Constant rotational angle in degree. The library should add this offset to each processed video frame. |
+| CONST_A_OFFSET                            | Constant rotational angle in radians. The library should add this offset to each processed video frame. |
 | INSTANT_X_OFFSET                          | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. |
 | INSTANT_Y_OFFSET                          | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. |
-| INSTANT_A_OFFSET                          | Instant (for one frame) rotational angle in degree. The library should add this offset to next processed video frame. |
+| INSTANT_A_OFFSET                          | Instant (for one frame) rotational angle in radians. The library should add this offset to next processed video frame. |
 | TYPE                                      | Algorithm type. Particular implementation can have unique values. Default values:<br/>0 - 2D. Stabilisation only on horizonatal and vertical directions.<br/>1 - 3D. Stabilisation on horizontal and vertical directions + rotation. |
 | CUT_FREQUENCY_HZ                          | Cat frequency, Hz. Stabiliser will block vibrations with frequency CUT_FREQUENCY_HZ. |
 | FPS                                       | Frames per second of input video.                            |
@@ -562,7 +563,7 @@ public:
     /// bigger than this limit the library should compensate only yOffsetLimit
     /// shift.
     int yOffsetLimit{150};
-    /// Maximum rotational image angle in degree per video frame. If image
+    /// Maximum rotational image angle in radians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
@@ -597,7 +598,7 @@ public:
     /// Constant vertical image offset in pixels. The library should add this
     /// offset to each processed video frame.
     int constYOffset{0};
-    /// Constant rotational angle in degree. The library should add this
+    /// Constant rotational angle in radians. The library should add this
     /// offset to each processed video frame.
     float constAOffset{0.0f};
     /// Instant (for one frame) horizontal image offset in pixels. The library
@@ -606,7 +607,7 @@ public:
     /// Instant (for one frame) vertical image offset in pixels. The library
     /// should add this offset to next processed video frame.
     int instantYOffset{0};
-    /// Instant (for one frame) rotational angle in degree. The library
+    /// Instant (for one frame) rotational angle in radians. The library
     /// should add this offset to next processed video frame.
     float instantAOffset{0.0f};
     /// Algorithm type. Default values:
@@ -662,7 +663,7 @@ public:
 | scaleFactor                             | int   | Scale factor. Value depends on implementation. Default: If 1 the library will process original frame size, if 2 the library will scale original frane size by 2, if 3 - by 3. |
 | xOffsetLimit                            | int   | Maximum horizontal image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only xOffsetLimit shift. |
 | yOffsetLimit                            | int   | Maximum vertical image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only yOffsetLimit shift. |
-| aOffsetLimit                            | float | Maximum rotational image angle in degree per video frame. If image absolute rotational angle bigger than this limit the library should compensate only aOffsetLimit angle. |
+| aOffsetLimit                            | float | Maximum rotational image angle in radians per video frame. If image absolute rotational angle bigger than this limit the library should compensate only aOffsetLimit angle. |
 | xFilterCoeff                            | float | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | yFilterCoeff                            | float | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | aFilterCoeff                            | float | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
@@ -670,10 +671,10 @@ public:
 | transparentBorder                       | bool  | Enable/disable transparent borders.                          |
 | constXOffset                            | int   | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
 | constYOffset                            | int   | Constant vertical image offset in pixels. The library should add this offset to each processed video frame. |
-| constAOffset                            | float | Constant rotational angle in degree. The library should add this offset to each processed video frame. |
+| constAOffset                            | float | Constant rotational angle in radians. The library should add this offset to each processed video frame. |
 | instantXOffset                          | int   | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. |
 | instantYOffset                          | int   | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. |
-| instantAOffset                          | int   | Instant (for one frame) rotational angle in degree. The library should add this offset to next processed video frame. |
+| instantAOffset                          | int   | Instant (for one frame) rotational angle in radians. The library should add this offset to next processed video frame. |
 | type                                    | int   | Algorithm type. Default values: 0 - 2D type 1. Stabilisation only on horizonatal and vertical. 1 - 2D type 2. Stabilisation only on horizonatal and vertical. 2 - 3D. Stabilisation on horizontal and vertical + rotation. Particular implementation can have unique values. |
 | cutFrequencyHz                          | float | Cat frequency, Hz. Stabiliser will block vibrations with frequency > cutFrequencyHz. |
 | fps                                     | float | Frames per second of input video.                            |
@@ -955,8 +956,6 @@ target_link_libraries(${PROJECT_NAME} VStabiliser)
 ```
 
 Done!
-
-## 
 
 
 
