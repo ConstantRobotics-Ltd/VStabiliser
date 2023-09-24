@@ -151,17 +151,21 @@ public:
     /**
      * @brief Encode params.
      * @param data Pointer to data buffer.
+     * @param bufferSize Data buffer size.
      * @param size Size of data.
      * @param mask Pointer to params mask to include in data.
+     * @return TRUE if params encoded (serialized) or FALSE if not.
      */
-    void encode(uint8_t* data, int& size, VStabiliserParamsMask* mask = nullptr);
+    bool encode(uint8_t* data, int bufferSize,
+                int& size, VStabiliserParamsMask* mask = nullptr);
 
     /**
      * @brief Decode params.
      * @param data Pointer to data.
+     * @param dataSize Size of data.
      * @return TRUE is params decoded or FALSE if not.
      */
-    bool decode(uint8_t* data);
+    bool decode(uint8_t* data, int dataSize);
 };
 
 
@@ -368,6 +372,14 @@ public:
                              VStabiliserParam& paramId,
                              VStabiliserCommand& commandId,
                              float& value);
+
+    /**
+     * @brief Decode and execute command.
+     * @param data Pointer to command data.
+     * @param size Size of data.
+     * @return TRUE if command decoded and executed or FALSE if not.
+     */
+    virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
 };
 }
 }

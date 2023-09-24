@@ -43,9 +43,13 @@ cr::vstab::VStabiliserParams &cr::vstab::VStabiliserParams::operator= (const cr:
 
 
 
-void cr::vstab::VStabiliserParams::encode(
-        uint8_t* data, int& size, cr::vstab::VStabiliserParamsMask* mask)
+bool cr::vstab::VStabiliserParams::encode(
+        uint8_t* data, int bufferSize, int& size, cr::vstab::VStabiliserParamsMask* mask)
 {
+    // Check buffer size.
+    if (bufferSize < 80)
+        return false;
+
     // Encode version.
     int pos = 0;
     data[pos] = 0x02; pos += 1;
@@ -84,7 +88,7 @@ void cr::vstab::VStabiliserParams::encode(
 
         size = pos;
 
-        return;
+        return true;
     }
 
     // Prepare mask.
@@ -197,12 +201,18 @@ void cr::vstab::VStabiliserParams::encode(
     }
 
     size = pos;
+
+    return true;
 }
 
 
 
-bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
+bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
 {
+    // Check data size.
+    if (dataSize < 6)
+        return false;
+
     // Check header.
     if (data[0] != 0x02)
         return false;
@@ -215,6 +225,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     int pos = 6;
     if ((data[3] & (uint8_t)128) == (uint8_t)128)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&scaleFactor, &data[pos], 4); pos += 4;
     }
     else
@@ -223,6 +235,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)64) == (uint8_t)64)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&xOffsetLimit, &data[pos], 4); pos += 4;
     }
     else
@@ -231,6 +245,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)32) == (uint8_t)32)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&yOffsetLimit, &data[pos], 4); pos += 4;
     }
     else
@@ -239,6 +255,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)16) == (uint8_t)16)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&aOffsetLimit, &data[pos], 4); pos += 4;
     }
     else
@@ -247,6 +265,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)8) == (uint8_t)8)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&xFilterCoeff, &data[pos], 4); pos += 4;
     }
     else
@@ -255,6 +275,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)4) == (uint8_t)4)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&yFilterCoeff, &data[pos], 4); pos += 4;
     }
     else
@@ -263,6 +285,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)2) == (uint8_t)2)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&aFilterCoeff, &data[pos], 4); pos += 4;
     }
     else
@@ -271,6 +295,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[3] & (uint8_t)1) == (uint8_t)1)
     {
+        if (dataSize < pos + 1)
+            return false;
         enable = data[pos] == 0x00 ? false : true; pos += 1;
     }
     else
@@ -281,6 +307,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
 
     if ((data[4] & (uint8_t)128) == (uint8_t)128)
     {
+        if (dataSize < pos + 1)
+            return false;
         transparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
     }
     else
@@ -289,6 +317,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)64) == (uint8_t)64)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&constXOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -297,6 +327,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)32) == (uint8_t)32)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&constYOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -305,6 +337,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)16) == (uint8_t)16)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&constAOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -313,6 +347,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)8) == (uint8_t)8)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&instantXOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -321,6 +357,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)4) == (uint8_t)4)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&instantYOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -329,6 +367,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)2) == (uint8_t)2)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&instantAOffset, &data[pos], 4); pos += 4;
     }
     else
@@ -337,6 +377,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[4] & (uint8_t)1) == (uint8_t)1)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&type, &data[pos], 4); pos += 4;
     }
     else
@@ -347,6 +389,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
 
     if ((data[5] & (uint8_t)128) == (uint8_t)128)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&cutFrequencyHz, &data[pos], 4); pos += 4;
     }
     else
@@ -355,6 +399,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[5] & (uint8_t)64) == (uint8_t)64)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&fps, &data[pos], 4); pos += 4;
     }
     else
@@ -363,6 +409,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[5] & (uint8_t)32) == (uint8_t)32)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&processingTimeMks, &data[pos], 4); pos += 4;
     }
     else
@@ -371,6 +419,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data)
     }
     if ((data[5] & (uint8_t)16) == (uint8_t)16)
     {
+        if (dataSize < pos + 4)
+            return false;
         memcpy(&logMod, &data[pos], 4);
     }
     else

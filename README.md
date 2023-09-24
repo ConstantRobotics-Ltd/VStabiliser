@@ -1,10 +1,12 @@
-![frame_logo](_static/vstabiliser_logo.png)
+![frame_logo](_static/vstabiliser_web_logo.png)
 
-# VStabiliser interface C++ class
 
-**v2.1.0**
 
-------
+# **VStabiliser interface C++ library**
+
+**v2.2.0**
+
+
 
 
 
@@ -12,6 +14,7 @@
 
 - [Overview](#Overview)
 - [Versions](#Versions)
+- [Library files](#Library-files)
 - [VStabiliser class description](#VStabiliser-class-description)
   - [VStabiliser class declaration](#VStabiliser-class-declaration)
   - [getVersion method](#getVersion-method)
@@ -25,7 +28,8 @@
   - [encodeSetParamCommand method](#encodeSetParamCommand-method)
   - [encodeCommand method](#encodeCommand-method)
   - [decodeCommand method](#decodeCommand-method)
-
+  - [decodeAndExecuteCommand method](#decodeAndExecuteCommand-method)
+  
 - [Data structures](#Data-structures)
   - [VStabiliserParam enum](#VStabiliserParam-enum)
   - [VStabiliserCommand enum](#VStabiliserCommand-enum)
@@ -35,12 +39,13 @@
   - [Deserialize video stabiliser params](#Deserialize-video-stabiliser-params)
   - [Read params from JSON file and write to JSON file](#Read-params-from-JSON-file-and-write-to-JSON-file)
 - [Build and connect to your project](#Build-and-connect-to-your-project)
+- [How to make custom implementation](#How-to-make-custom-implementation)
 
 
 
 # Overview
 
-**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilisation algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, data structures and service functions to encode/decode parameter and commands. Different video stabiliser classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures (**VStabiliserCommand** enum, **VStabiliserParam** enum and **VStabiliserParams** class) and **VStabiliser** class declaration. **VStabiliserCommand** enum contains IDs of commands supported by **VStabiliser** class. **VStabiliserParam** enum contains IDs of params supported by **VStabiliser** class. **VStabiliserParams** class contains fields for video stabiliser params values and provides methods to encode/decode and read/write params from JSON file. All video stabilisers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) (video frame data structure) and [**ConfigReader**](https://github.com/ConstantRobotics-Ltd/Frame) (provides methods to read/write JSON config files).
+**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilisation algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabiliser classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([**VStabiliserCommand enum**](#VStabiliserCommand-enum), [**VStabiliserParam enum**](#VStabiliserParam-enum) and [**VStabiliserParams class**](#VStabiliserParams-class-description)) and **VStabiliser** class declaration. [**VStabiliserCommand enum**](#VStabiliserCommand-enum) contains IDs of commands supported by **VStabiliser** class. [**VStabiliserParam enum**](#VStabiliserParam-enum) contains IDs of params supported by **VStabiliser** class. [**VStabiliserParams class**](#VStabiliserParams-class-description) contains fields for video stabiliser params values and provides methods to encode/decode and read/write params from JSON file. All video stabilisers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) (video frame data structure) and [**ConfigReader**](https://github.com/ConstantRobotics-Ltd/Frame) (provides methods to read/write JSON config files).
 
 
 
@@ -54,10 +59,42 @@
 | 2.0.0   | 11.07.2023   | - Added VStabiliserParams class to keep library parameters.<br />- Added method to encode/decode commands.<br />- Added test application.<br />- Added license.<br />- Repository made public. |
 | 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application. |
 | 2.1.0   | 30.07.2023   | - Switched from radians to radians in params.                |
+| 2.2.0   | 24.07.2023   | - Updated encode(...) and decode(...) methods of VStabiliserParams.<br />- Added decodeAndExecuteCommand(...) method.<br />- Added example of video stabiliser implementation. |
+
+
+
+# Library files
+
+The **VStabiliser** library is a CMake project. Library files:
+
+```xml
+CMakeLists.txt ------------------- Main CMake file of the library.
+3rdparty ------------------------- Folder with third-party libraries.
+    CMakeLists.txt --------------- CMake file which includes third-party. libraries.
+    ConfigReader ----------------- Source code of the ConfigReader library.
+    Frame ------------------------ Source code of the Frame library.
+example -------------------------- Folder with custom video stabiliser class.
+    CMakeLists.txt --------------- CMake file for custom video stabiliser class.
+    CustomVStabiliser.cpp -------- Source code file of the CustomVStabiliser class.
+    CustomVStabiliser.h ---------- Header with CustomVStabiliser class declaration.
+    CustomVStabiliserVersion.h --- Header file which includes CustomVStabiliser version.
+    CustomVStabiliserVersion.h.in  CMake service file to generate version file.
+test ----------------------------- Folder with codec test application.
+    CMakeLists.txt --------------- CMake file for codec test application.
+    main.cpp --------------------- Source code file of VStabiliser class test application.
+src ------------------------------ Folder with source code of the library.
+    CMakeLists.txt --------------- CMake file of the library.
+    VStabiliser.cpp -------------- Source code file of the library.
+    VStabiliser.h ---------------- Header file which includes VStabiliser class declaration.
+    VStabiliserVersion.h --------- Header file which includes version of the library.
+    VStabiliserVersion.h.in ------ CMake service file to generate version file.
+```
 
 
 
 # VStabiliser class description
+
+
 
 ## VStabiliser class declaration
 
@@ -67,87 +104,48 @@
 class VStabiliser
 {
 public:
-    /**
-     * @brief Get string of current class version.
-     * @return String of current class version.
-     */
+    
+    /// Get string of current class version.
     static std::string getVersion();
-    /**
-     * @brief Init all video stabiliser params by params structure.
-     * @param params Parameters class.
-     * @return TRUE if params was accepted or FALSE if not.
-     */
+
+    /// Init all video stabiliser params by params structure.
     virtual bool initVStabiliser(VStabiliserParams& params) = 0;
-    /**
-     * @brief Set param.
-     * @param id Param ID.
-     * @param value Param value.
-     * @return TRUE if param was accepted or FALSE if not.
-     */
+
+    /// Set param.
     virtual bool setParam(VStabiliserParam id, float value) = 0;
-    /**
-     * @brief Get param.
-     * @param id Param ID.
-     * @return Param value or -1 if this param not supported by implementation.
-     */
+
+    /// Get param.
     virtual float getParam(VStabiliserParam id) = 0;
-    /**
-     * @brief Get params.
-     * @return Params class.
-     */
+
+    /// Get params.
     virtual VStabiliserParams getParams() = 0;
-    /**
-     * @brief Execute command.
-     * @param id Command ID.
-     * @return TRUE if the command executed or FALSE if not.
-     */
+
+    /// Execute command.
     virtual bool executeCommand(VStabiliserCommand id) = 0;
-    /**
-     * @brief Stabilise video frame.
-     * @param src Source vidoe frame.
-     * @param dst Result video frame.
-     * @return TRUE if video frame processed or FALSE in case any errors.
-     */
+
+    /// Stabilise video frame.
     virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
-    /**
-     * @brief Get offsets: horithontal, vertical and rotation. The method must
-     * return current offsets which implemented to last processed video frame.
-     * @param dX Horizontal offset.
-     * @param dY Vertical offset.
-     * @param dA Rotational angle, radians.
-     */
+
+    /// Get offsets: horithontal, vertical and rotation.
     virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
-    /**
-     * @brief Encode set param command.
-     * @param data Pointer to data buffer. Must have size >= 11.
-     * @param size Size of encoded data.
-     * @param id Parameter id.
-     * @param value Parameter value.
-     */
+
+    /// Encode set param command.
     static void encodeSetParamCommand(
             uint8_t* data, int& size, VStabiliserParam id, float value);
-    /**
-     * @brief Encode command.
-     * @param data Pointer to data buffer. Must have size >= 11.
-     * @param size Size of encoded data.
-     * @param id Command ID.
-     */
+
+    /// Encode command.
     static void encodeCommand(
             uint8_t* data, int& size, VStabiliserCommand id);
-    /**
-     * @brief Decode command.
-     * @param data Pointer to command data.
-     * @param size Size of data.
-     * @param paramId Output command ID.
-     * @param commandId Output command ID.
-     * @param value Param or command value.
-     * @return 0 - command decoded, 1 - set param command decoded, -1 - error.
-     */
+
+    /// Decode command.
     static int decodeCommand(uint8_t* data,
                              int size,
                              VStabiliserParam& paramId,
                              VStabiliserCommand& commandId,
                              float& value);
+
+    /// Decode and execute command.
+    virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
 };
 ```
 
@@ -170,14 +168,14 @@ cout << "VStabiliser class version: " << VStabiliser::getVersion() << endl;
 Console output:
 
 ```bash
-VStabiliser class version: 2.0.0
+VStabiliser class version: 2.2.0
 ```
 
 
 
 ## initVStabiliser method
 
-**initVStabiliser(...)** method intended to initialize video stabiliser parameters by parameters structure. Method copy all video stabiliser parameter to internal variables. Method declaration:
+**initVStabiliser(...)** method initializes video stabiliser parameters by parameters structure. Method copy all video stabiliser parameter to internal variables. Method declaration:
 
 ```cpp
 virtual bool initVStabiliser(VStabiliserParams& params) = 0;
@@ -185,7 +183,7 @@ virtual bool initVStabiliser(VStabiliserParams& params) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| params    | Parameters class (see **VStabiliserParams** class description). |
+| params    | Parameters class (see  [**VStabiliserParams class**](#VStabiliserParams-class-description) description). |
 
 **Returns:** TRUE if params was accepted or FALSE if not.
 
@@ -193,16 +191,16 @@ virtual bool initVStabiliser(VStabiliserParams& params) = 0;
 
 ## setParam method
 
-**setParam(...)** method intended to change video stabiliser parameter. Method declaration:
+**setParam(...)** method intended to change video stabiliser parameter. The particular implementation of the video stabiliser must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 ```
 
-| Parameter | Description                                          |
-| --------- | ---------------------------------------------------- |
-| id        | Parameter ID according to **VStabiliserParam** enum. |
-| value     | Parameter value. Depends on parameter ID.            |
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
+| value     | Parameter value. Depends on parameter ID.                    |
 
 **Returns:** TRUE if param was accepted or FALSE if not.
 
@@ -210,43 +208,43 @@ virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 
 ## getParam method
 
-**getParam(...)** method intended to get video stabiliser parameter value. Method declaration:
+**getParam(...)** method intended to get video stabiliser parameter value. The particular implementation of the video stabiliser must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
 ```
 
-| Parameter | Description                                          |
-| --------- | ---------------------------------------------------- |
-| id        | Parameter ID according to **VStabiliserParam** enum. |
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
 
-**Returns:** Parameter value or -1 if this param not supported by implementation.
+**Returns:** Parameter value or **-1** if this param not supported by implementation.
 
 
 
 ## getParams method
 
-**getParams(...)** method designed to obtain all video stabiliser parameters. Method declaration:
+**getParams(...)** method designed to obtain all video stabiliser parameters. The particular implementation of the video stabiliser must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual VStabiliserParams getParams() = 0;
 ```
 
-**Returns:** **VStabiliserParams** class which contains all current parameters value.
+**Returns:** [**VStabiliserParams class**](#VStabiliserParams-class-description) object which contains all current parameters value.
 
 
 
 ## executeCommand method
 
-**executeCommand(...)** method intended to execute video stabiliser command. Method declaration:
+**executeCommand(...)** method intended to execute video stabiliser command. The particular implementation of the video stabiliser must provide thread-safe **executeCommand(...)** method call. This means that the **executeCommand(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
 ```
 
-| Parameter | Description                                          |
-| --------- | ---------------------------------------------------- |
-| id        | Command ID according to **VStabiliserCommand** enum. |
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| id        | Command ID according to [**VStabiliserCommand enum**](#VStabiliserCommand-enum). |
 
 **Returns:** TRUE if the command executed or FALSE if not.
 
@@ -262,7 +260,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of **Frame** class). Particular implementation can support all, only one or few pixel formats listed in **Frame** class description. |
+| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) class). Particular implementation can support all, only one or few pixel formats listed in [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) class description. |
 | dst       | Result frame. The pixel format of the result frame must be the same as source frame. If stabilisation disabled (param **MODE** set to 0) the library must copy data from source frame to result frame. |
 
 **Returns:** TRUE if video frame processed or FALSE in case any errors.
@@ -271,7 +269,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 ## getOffsets methods
 
-**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (radians) implemented to last processed video frame (**stabilise** method). Method declaration:
+**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (radians) implemented to last processed video frame (**stabilise** method). The particular implementation of the video stabiliser must provide thread-safe **getOffsets(...)** method call. This means that the **getOffsets(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
@@ -281,7 +279,7 @@ virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
 | --------- | ------------------------------------------------------------ |
 | dX        | Reference to output value of horizontal offset (pixels) implemented to last processed video frame. |
 | dY        | Reference to output value of vertical offset (pixels) implemented to last processed video frame. |
-| dA        | Reference to output value of rotational angle (radiansee) implemented to last processed video frame. |
+| dA        | Reference to output value of rotational angle (radians) implemented to last processed video frame. |
 
 
 
@@ -297,16 +295,16 @@ static void encodeSetParamCommand(uint8_t* data, int& size, VStabiliserParam id,
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to data buffer for encoded command. Must have size >= 11. |
 | size      | Size of encoded data. Will be 11 bytes.                      |
-| id        | Parameter ID according to **VStabiliserParam** enum.         |
+| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
 | value     | Parameter value.                                             |
 
-**SET_PARAM** command format:
+**SET_PARAM** command format (11 bytes):
 
 | Byte | Value | Description                                        |
 | ---- | ----- | -------------------------------------------------- |
 | 0    | 0x01  | SET_PARAM command header value.                    |
 | 1    | 0x02  | Major version of VStabiliser class.                |
-| 2    | 0x00  | Minor version of VStabiliser class.                |
+| 2    | 0x02  | Minor version of VStabiliser class.                |
 | 3    | id    | Parameter ID **int32_t** in Little-endian format.  |
 | 4    | id    | Parameter ID **int32_t** in Little-endian format.  |
 | 5    | id    | Parameter ID **int32_t** in Little-endian format.  |
@@ -343,15 +341,15 @@ static void encodeCommand(uint8_t* data, int& size, VStabiliserCommand id);
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to data buffer for encoded command. Must have size >= 11. |
 | size      | Size of encoded data. Will be 7 bytes.                       |
-| id        | Command ID according to **VStabiliserCommand** enum.         |
+| id        | Command ID according to [**VStabiliserCommand enum**](#VStabiliserCommand-enum). |
 
-**COMMAND** format:
+**COMMAND** format (7 bytes):
 
 | Byte | Value | Description                                     |
 | ---- | ----- | ----------------------------------------------- |
 | 0    | 0x00  | SET_PARAM command header value.                 |
-| 1    | 0x04  | Major version of VStabiliser class.             |
-| 2    | 0x00  | Minor version of VStabiliser class.             |
+| 1    | 0x02  | Major version of VStabiliser class.             |
+| 2    | 0x02  | Minor version of VStabiliser class.             |
 | 3    | id    | Command ID **int32_t** in Little-endian format. |
 | 4    | id    | Command ID **int32_t** in Little-endian format. |
 | 5    | id    | Command ID **int32_t** in Little-endian format. |
@@ -382,11 +380,47 @@ static int decodeCommand(uint8_t* data, int size, VStabiliserParam& paramId, VSt
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to input command.                                    |
 | size      | Size of command. Should be 11 bytes (for SET_PARAMS) or 7 bytes for (COMMAND). |
-| paramId   | Video stabiliser parameter ID according to **VStabiliserParam** enum. After decoding SET_PARAM command the method will return parameter ID. |
-| commandId | VStabiliser command ID according to **VStabiliserCommand** enum. After decoding COMMAND the method will return command ID. |
+| paramId   | Video stabiliser parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). After decoding SET_PARAM command the method will return parameter ID. |
+| commandId | Video stabiliser command ID according to[**VStabiliserCommand enum**](#VStabiliserCommand-enum). After decoding COMMAND the method will return command ID. |
 | value     | Video stabiliser parameter value after decoding SET_PARAM command. |
 
 **Returns:** **0** - in case decoding COMMAND, **1** - in case decoding SET_PARAM command or **-1** in case errors.
+
+**decodeCommand(...)** is static and used without **VStabiliser** class instance. Command decoding example:
+
+```cpp
+// Buffer for encoded data.
+uint8_t data[11];
+int size = 0;
+VStabiliser::encodeCommand(data, size, VStabiliserCommand::ON);
+
+// Decode command.
+VStabiliserCommand commandId;
+VStabiliserParam paramId;
+float value = (float)(rand() % 20);
+if (VStabiliser::decodeCommand(data, size, paramId, commandId, value) != 0)
+{
+    cout << "Command not decoded" << endl;
+    return false;
+}
+```
+
+
+
+## decodeAndExecuteCommand method
+
+**decodeAndExecuteCommand(...)** method decodes and executes command on video stabiliser side. The particular implementation of the video stabiliser must provide thread-safe **decodeAndExecuteCommand(...)** method call. This means that the **decodeAndExecuteCommand(...)** method can be safely called from any thread. Method declaration:
+
+```cpp
+virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
+```
+
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| data      | Pointer to input command.                                    |
+| size      | Size of command. Must be 11 bytes for SET_PARAM or 7 bytes for COMMAND. |
+
+**Returns:** TRUE if command decoded (SET_PARAM or COMMAND) and executed (action command or set param command).
 
 
 
@@ -563,7 +597,7 @@ public:
     /// bigger than this limit the library should compensate only yOffsetLimit
     /// shift.
     int yOffsetLimit{150};
-    /// Maximum rotational image angle in radians per video frame. If image
+    /// Maximum rotational image angle in readians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
@@ -590,7 +624,7 @@ public:
     float aFilterCoeff{0.9f};
     /// Enable/disable stabilisation.
     bool enable{true};
-    /// Enable/disable transparent borders.
+    /// Enable/disable trasparent borders.
     bool transparentBorder{true};
     /// Constant horizontal image offset in pixels. The library should add this
     /// offset to each processed video frame.
@@ -632,27 +666,15 @@ public:
                   enable, transparentBorder, constXOffset, constYOffset,
                   constAOffset, type, cutFrequencyHz, fps, logMod);
 
-    /**
-     * @brief operator =
-     * @param src Source object.
-     * @return VStabiliserParams obect.
-     */
+    /// operator =
     VStabiliserParams& operator= (const VStabiliserParams& src);
 
-    /**
-     * @brief Encode params.
-     * @param data Pointer to data buffer.
-     * @param size Size of data.
-     * @param mask Pointer to params mask to include in data.
-     */
-    void encode(uint8_t* data, int& size, VStabiliserParamsMask* mask = nullptr);
+    /// Encode params.
+    bool encode(uint8_t* data, int bufferSize,
+                int& size, VStabiliserParamsMask* mask = nullptr);
 
-    /**
-     * @brief Decode params.
-     * @param data Pointer to data.
-     * @return TRUE is params decoded or FALSE if not.
-     */
-    bool decode(uint8_t* data);
+    /// Decode params.
+    bool decode(uint8_t* data, int dataSize);
 };
 ```
 
@@ -690,14 +712,15 @@ public:
 **VStabiliserParams** class provides method **encode(...)** to serialize video stabiliser params (fields of VStabiliserParams class, see Table 4). Serialization of params necessary in case when you need to send params via communication channels. Method provide options to exclude particular parameters from serialization. To do this method inserts binary mask (3 bytes) where each bit represents particular parameter and **decode(...)** method recognizes it. Method declaration:
 
 ```cpp
-void encode(uint8_t* data, int& size, VStabiliserParamsMask* mask = nullptr);
+bool encode(uint8_t* data, int bufferSize, int& size, VStabiliserParamsMask* mask = nullptr);
 ```
 
-| Parameter | Value                                                        |
-| --------- | ------------------------------------------------------------ |
-| data      | Pointer to data buffer.                                      |
-| size      | Size of encoded data.                                        |
-| mask      | Parameters mask - pointer to **VStabiliserParamsMask** structure. **VStabiliserParamsMask** (declared in VStabiliser.h file) determines flags for each field (parameter) declared in **VStabiliserParams** class. If the user wants to exclude any parameters from serialization, he can put a pointer to the mask. If the user wants to exclude a particular parameter from serialization, he should set the corresponding flag in the VStabiliserParamsMask structure. |
+| Parameter  | Value                                                        |
+| ---------- | ------------------------------------------------------------ |
+| data       | Pointer to data buffer.                                      |
+| bufferSize | Data buffer size. Must have size >= 80 bytes.                |
+| size       | Size of encoded data.                                        |
+| mask       | Parameters mask - pointer to **VStabiliserParamsMask** structure. **VStabiliserParamsMask** (declared in VStabiliser.h file) determines flags for each field (parameter) declared in **VStabiliserParams** class. If the user wants to exclude any parameters from serialization, he can put a pointer to the mask. If the user wants to exclude a particular parameter from serialization, he should set the corresponding flag in the VStabiliserParamsMask structure. |
 
 **VStabiliserParamsMask** structure declaration:
 
@@ -734,7 +757,7 @@ Example without parameters mask:
 VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
-in.encode(data, size);
+in.encode(data, 1024, size);
 cout << "Encoded data size: " << size << " bytes" << endl;
 ```
 
@@ -749,7 +772,7 @@ mask.scaleFactor = true; // Exclude scaleFactor. Others by default.
 VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
-in.encode(data, size, &mask);
+in.encode(data, 1024, size, &mask);
 cout << "Encoded data size: " << size << " bytes" << endl;
 ```
 
@@ -760,7 +783,7 @@ cout << "Encoded data size: " << size << " bytes" << endl;
 **VStabiliserParams** class provides method **decode(...)** to deserialize params (fields of VStabiliserParams class, see Table 4). Deserialization of params necessary in case when you need to receive params via communication channels. Method automatically recognizes which parameters were serialized by **encode(...)** method. Method declaration:
 
 ```cpp
-bool decode(uint8_t* data);
+bool decode(uint8_t* data, int dataSize);
 ```
 
 | Parameter | Value                   |
@@ -776,7 +799,7 @@ Example:
 VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
-in.encode(data, size);
+in.encode(data, 1024, size);
 cout << "Encoded data size: " << size << " bytes" << endl;
 
 // Decode data.
@@ -919,6 +942,7 @@ SET(${PARENT}_SUBMODULE_VSTABILISER                     ON  CACHE BOOL "" FORCE)
 if (${PARENT}_SUBMODULE_VSTABILISER)
     SET(${PARENT}_VSTABILISER                           ON  CACHE BOOL "" FORCE)
     SET(${PARENT}_VSTABILISER_TEST                      OFF CACHE BOOL "" FORCE)
+    SET(${PARENT}_VSTABILISER_EXECUTE                   OFF CACHE BOOL "" FORCE)
 endif()
 
 ################################################################################
@@ -959,17 +983,52 @@ Done!
 
 
 
+# How to make custom implementation
 
+The **VStabiliser** class provides only an interface, data structures, and methods for encoding and decoding commands and params. To create your own implementation of the video stabiliser, you must include the VStabiliser repository in your project (see [**Build and connect to your project**](#Build-and-connect-to-your-project) section). The catalogue **example** (see [**Library files**](#Library-files) section) includes an example of the design of the custom video stabiliser. You must implement all the methods of the VStabiliser interface class. Custom video stabiliser class declaration:
 
+```cpp
+class CustomVStabiliser: public VStabiliser
+{
+public:
 
+    /// Class constructor.
+    CustomVStabiliser();
 
+    /// Class destructor.
+    ~CustomVStabiliser();
 
+    /// Get string of current class version.
+    std::string getVersion();
 
+    /// Init all video stabiliser params by params structure.
+    bool initVStabiliser(VStabiliserParams& params);
 
+    /// Set param.
+    bool setParam(VStabiliserParam id, float value);
 
+    /// Get param.
+    float getParam(VStabiliserParam id);
 
+    /// Get params.
+    VStabiliserParams getParams();
 
+    /// Execute command.
+    bool executeCommand(VStabiliserCommand id);
 
+    /// Stabilise video frame.
+    bool stabilise(cr::video::Frame& src, cr::video::Frame& dst);
 
+    /// Get offsets: horithontal, vertical and rotation.
+    void getOffsets(float& dX, float& dY, float& dA);
 
+    /// Decode and execute command.
+    bool decodeAndExecuteCommand(uint8_t* data, int size);
+
+private:
+
+    /// Video stabiliser params (default params).
+    VStabiliserParams m_params;
+};
+```
 
