@@ -4,7 +4,7 @@
 
 # **VStabiliser interface C++ library**
 
-**v2.2.0**
+**v2.3.0**
 
 
 
@@ -60,6 +60,7 @@
 | 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application. |
 | 2.1.0   | 30.07.2023   | - Switched from radians to radians in params.                |
 | 2.2.0   | 24.07.2023   | - Updated encode(...) and decode(...) methods of VStabiliserParams.<br />- Added decodeAndExecuteCommand(...) method.<br />- Added example of video stabiliser implementation. |
+| 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
 
 
 
@@ -118,7 +119,7 @@ public:
     virtual float getParam(VStabiliserParam id) = 0;
 
     /// Get params.
-    virtual VStabiliserParams getParams() = 0;
+    virtual void getParams(VStabiliserParams& params) = 0;
 
     /// Execute command.
     virtual bool executeCommand(VStabiliserCommand id) = 0;
@@ -227,10 +228,12 @@ virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
 **getParams(...)** method designed to obtain all video stabiliser parameters. The particular implementation of the video stabiliser must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
-virtual VStabiliserParams getParams() = 0;
+virtual void getParams(VStabiliserParams& params) = 0;
 ```
 
-**Returns:** [**VStabiliserParams class**](#VStabiliserParams-class-description) object which contains all current parameters value.
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| params    | Video stabiliser parameters class object (VStabiliserParams). |
 
 
 
@@ -304,7 +307,7 @@ static void encodeSetParamCommand(uint8_t* data, int& size, VStabiliserParam id,
 | ---- | ----- | -------------------------------------------------- |
 | 0    | 0x01  | SET_PARAM command header value.                    |
 | 1    | 0x02  | Major version of VStabiliser class.                |
-| 2    | 0x02  | Minor version of VStabiliser class.                |
+| 2    | 0x03  | Minor version of VStabiliser class.                |
 | 3    | id    | Parameter ID **int32_t** in Little-endian format.  |
 | 4    | id    | Parameter ID **int32_t** in Little-endian format.  |
 | 5    | id    | Parameter ID **int32_t** in Little-endian format.  |
@@ -349,7 +352,7 @@ static void encodeCommand(uint8_t* data, int& size, VStabiliserCommand id);
 | ---- | ----- | ----------------------------------------------- |
 | 0    | 0x00  | SET_PARAM command header value.                 |
 | 1    | 0x02  | Major version of VStabiliser class.             |
-| 2    | 0x02  | Minor version of VStabiliser class.             |
+| 2    | 0x03  | Minor version of VStabiliser class.             |
 | 3    | id    | Command ID **int32_t** in Little-endian format. |
 | 4    | id    | Command ID **int32_t** in Little-endian format. |
 | 5    | id    | Command ID **int32_t** in Little-endian format. |
@@ -1011,7 +1014,7 @@ public:
     float getParam(VStabiliserParam id);
 
     /// Get params.
-    VStabiliserParams getParams();
+    void getParams(VStabiliserParams& params);
 
     /// Execute command.
     bool executeCommand(VStabiliserCommand id);

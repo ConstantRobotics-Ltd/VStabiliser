@@ -246,9 +246,9 @@ float cr::vstab::CustomVStabiliser::getParam(VStabiliserParam id)
 
 
 
-cr::vstab::VStabiliserParams cr::vstab::CustomVStabiliser::getParams()
+void cr::vstab::CustomVStabiliser::getParams(cr::vstab::VStabiliserParams& params)
 {
-    return m_params;
+    params = m_params;
 }
 
 

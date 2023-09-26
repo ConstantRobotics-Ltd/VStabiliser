@@ -35,7 +35,7 @@ public:
     float getParam(VStabiliserParam id);
 
     /// Get params.
-    VStabiliserParams getParams();
+    void getParams(VStabiliserParams& params);
 
     /// Execute command.
     bool executeCommand(VStabiliserCommand id);

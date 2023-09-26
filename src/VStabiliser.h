@@ -311,9 +311,9 @@ public:
 
     /**
      * @brief Get params.
-     * @return Params class.
+     * @param params Params class object.
      */
-    virtual VStabiliserParams getParams() = 0;
+    virtual void getParams(VStabiliserParams& params) = 0;
 
     /**
      * @brief Execute command.
