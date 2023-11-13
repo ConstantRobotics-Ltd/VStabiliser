@@ -4,7 +4,7 @@
 
 # **VStabiliser interface C++ library**
 
-**v2.3.0**
+**v2.3.1**
 
 
 
@@ -61,6 +61,7 @@
 | 2.1.0   | 30.07.2023   | - Switched from radians to radians in params.                |
 | 2.2.0   | 24.07.2023   | - Updated encode(...) and decode(...) methods of VStabiliserParams.<br />- Added decodeAndExecuteCommand(...) method.<br />- Added example of video stabiliser implementation. |
 | 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
+| 2.3.1   | 13.11.2023   | - Frame class updated.                                       |
 
 
 
