@@ -3,6 +3,13 @@
 
 
 
+cr::vstab::VStabiliser::~VStabiliser()
+{
+
+}
+
+
+
 std::string cr::vstab::VStabiliser::getVersion()
 {
     return VSTABILISER_VERSION;
