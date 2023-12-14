@@ -282,6 +282,11 @@ class VStabiliser
 public:
 
     /**
+     * @brief Class destructor.
+     */
+    virtual ~VStabiliser();
+
+    /**
      * @brief Get string of current class version.
      * @return String of current class version.
      */
