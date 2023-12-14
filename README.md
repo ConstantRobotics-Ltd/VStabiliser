@@ -62,7 +62,7 @@
 | 2.2.0   | 24.07.2023   | - Updated encode(...) and decode(...) methods of VStabiliserParams.<br />- Added decodeAndExecuteCommand(...) method.<br />- Added example of video stabiliser implementation. |
 | 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
 | 2.3.1   | 13.11.2023   | - Frame class updated.                                       |
-| 2.4.1   | 13.12.2023   | - Virtual destructor added.                                       |
+| 2.4.1   | 14.12.2023   | - Virtual destructor added.<br />- Frame class updated.      |
 
 
 
