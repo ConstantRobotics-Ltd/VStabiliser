@@ -4,7 +4,7 @@
 
 # **VStabiliser interface C++ library**
 
-**v2.4.1**
+**v2.4.2**
 
 
 
@@ -63,6 +63,7 @@
 | 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
 | 2.3.1   | 13.11.2023   | - Frame class updated.                                       |
 | 2.4.1   | 14.12.2023   | - Virtual destructor added.<br />- Frame class updated.      |
+| 2.4.2   | 04.01.2023   | - GitHub compliant license added.                            |
 
 
 
