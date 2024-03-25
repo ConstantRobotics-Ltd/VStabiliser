@@ -1,51 +1,48 @@
-![frame_logo](_static/vstabiliser_web_logo.png)
+![vstabiliser_web_logo](_static/vstabiliser_web_logo.png)
 
 
 
 # **VStabiliser interface C++ library**
 
-**v2.4.2**
-
-
+**v2.4.3**
 
 
 
 # Table of contents
 
-- [Overview](#Overview)
-- [Versions](#Versions)
-- [Library files](#Library-files)
-- [VStabiliser class description](#VStabiliser-class-description)
-  - [VStabiliser class declaration](#VStabiliser-class-declaration)
-  - [getVersion method](#getVersion-method)
-  - [initVStabiliser method](#initVStabiliser-method)
-  - [setParam method](#setParam-method)
-  - [getParam method](#getParam-method)
-  - [getParams method](#getParams-method)
-  - [executeCommand method](#executeCommand-method)
+- [Overview](#overview)
+- [Versions](#versions)
+- [Library files](#library-files)
+- [VStabiliser class description](#vstabiliser-class-description)
+  - [VStabiliser class declaration](#vstabiliser-class-declaration)
+  - [getVersion method](#getversion-method)
+  - [initVStabiliser method](#initvstabiliser-method)
+  - [setParam method](#setparam-method)
+  - [getParam method](#getparam-method)
+  - [getParams method](#getparams-method)
+  - [executeCommand method](#executecommand-method)
   - [stabilise method](#stabilise-method)
-  - [getOffsets methods](#getOffsets-methods)
-  - [encodeSetParamCommand method](#encodeSetParamCommand-method)
-  - [encodeCommand method](#encodeCommand-method)
-  - [decodeCommand method](#decodeCommand-method)
-  - [decodeAndExecuteCommand method](#decodeAndExecuteCommand-method)
-  
-- [Data structures](#Data-structures)
-  - [VStabiliserParam enum](#VStabiliserParam-enum)
-  - [VStabiliserCommand enum](#VStabiliserCommand-enum)
-- [VStabiliserParams class description](#VStabiliserParams-class-description)
-  - [VStabiliserParams class declaration](#VStabiliserParams-class-declaration)
-  - [Serialize video stabiliser params](#Serialize-video-stabiliser-params)
-  - [Deserialize video stabiliser params](#Deserialize-video-stabiliser-params)
-  - [Read params from JSON file and write to JSON file](#Read-params-from-JSON-file-and-write-to-JSON-file)
-- [Build and connect to your project](#Build-and-connect-to-your-project)
-- [How to make custom implementation](#How-to-make-custom-implementation)
+  - [getOffsets methods](#getoffsets-methods)
+  - [encodeSetParamCommand method](#encodesetparamcommand-method)
+  - [encodeCommand method](#encodecommand-method)
+  - [decodeCommand method](#decodecommand-method)
+  - [decodeAndExecuteCommand method](#decodeandexecutecommand-method)
+- [Data structures](#data-structures)
+  - [VStabiliserParam enum](#vstabiliserparam-enum)
+  - [VStabiliserCommand enum](#vstabilisercommand-enum)
+- [VStabiliserParams class description](#vstabiliserparams-class-description)
+  - [VStabiliserParams class declaration](#vstabiliserparams-class-declaration)
+  - [Serialize video stabiliser params](#serialize-video-stabiliser-params)
+  - [Deserialize video stabiliser params](#deserialize-video-stabiliser-params)
+  - [Read params from JSON file and write to JSON file](#read-params-from-json-file-and-write-to-json-file)
+- [Build and connect to your project](#build-and-connect-to-your-project)
+- [How to make custom implementation](#how-to-make-custom-implementation)
 
 
 
 # Overview
 
-**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilisation algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabiliser classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([**VStabiliserCommand enum**](#VStabiliserCommand-enum), [**VStabiliserParam enum**](#VStabiliserParam-enum) and [**VStabiliserParams class**](#VStabiliserParams-class-description)) and **VStabiliser** class declaration. [**VStabiliserCommand enum**](#VStabiliserCommand-enum) contains IDs of commands supported by **VStabiliser** class. [**VStabiliserParam enum**](#VStabiliserParam-enum) contains IDs of params supported by **VStabiliser** class. [**VStabiliserParams class**](#VStabiliserParams-class-description) contains fields for video stabiliser params values and provides methods to encode/decode and read/write params from JSON file. All video stabilisers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) (video frame data structure) and [**ConfigReader**](https://github.com/ConstantRobotics-Ltd/Frame) (provides methods to read/write JSON config files).
+**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilization algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabiliser classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([VStabiliserCommand](#vstabilisercommand-enum) enum, [VStabiliserParam](#vstabiliserparam-enum) enum and [VStabiliserParams](#vstabiliserparams-class-description) class) and **VStabiliser** class declaration. [VStabiliserCommand](#vstabilisercommand-enum) enum contains IDs of commands supported by **VStabiliser** class. [VStabiliserParam](#vstabiliserparam-enum) enum contains IDs of params supported by **VStabiliser** class. [VStabiliserParams](#vstabiliserparams-class-description) class contains fields for video stabilizer params values and provides methods to encode/decode and read/write params from JSON file. All video stabilizers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [Frame](https://github.com/ConstantRobotics-Ltd/Frame) (video frame data structure) and [ConfigReader](https://github.com/ConstantRobotics-Ltd/Frame) (provides methods to read/write JSON config files). It uses C++17 standard. The library is licensed under the **Apache 2.0** license.
 
 
 
@@ -63,13 +60,14 @@
 | 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
 | 2.3.1   | 13.11.2023   | - Frame class updated.                                       |
 | 2.4.1   | 14.12.2023   | - Virtual destructor added.<br />- Frame class updated.      |
-| 2.4.2   | 04.01.2023   | - GitHub compliant license added.                            |
+| 2.4.2   | 04.01.2024   | - GitHub compliant license added.                            |
+| 2.4.3   | 25.03.2024   | - Frame class updated.<br />- ConfigReader class updated.<br />- Documentation updated. |
 
 
 
 # Library files
 
-The **VStabiliser** library is a CMake project. Library files:
+The library supplied by source code only. The user would be given a set of files in the form of a CMake project (repository). The repository structure is shown below:
 
 ```xml
 CMakeLists.txt ------------------- Main CMake file of the library.
@@ -77,15 +75,15 @@ CMakeLists.txt ------------------- Main CMake file of the library.
     CMakeLists.txt --------------- CMake file which includes third-party. libraries.
     ConfigReader ----------------- Source code of the ConfigReader library.
     Frame ------------------------ Source code of the Frame library.
-example -------------------------- Folder with custom video stabiliser class.
-    CMakeLists.txt --------------- CMake file for custom video stabiliser class.
+example -------------------------- Folder with custom video stabilizer class.
+    CMakeLists.txt --------------- CMake file for custom video stabilizer class.
     CustomVStabiliser.cpp -------- Source code file of the CustomVStabiliser class.
     CustomVStabiliser.h ---------- Header with CustomVStabiliser class declaration.
     CustomVStabiliserVersion.h --- Header file which includes CustomVStabiliser version.
     CustomVStabiliserVersion.h.in  CMake service file to generate version file.
-test ----------------------------- Folder with codec test application.
-    CMakeLists.txt --------------- CMake file for codec test application.
-    main.cpp --------------------- Source code file of VStabiliser class test application.
+test ----------------------------- Folder with test application.
+    CMakeLists.txt --------------- CMake file for test application.
+    main.cpp --------------------- Source code file of test application.
 src ------------------------------ Folder with source code of the library.
     CMakeLists.txt --------------- CMake file of the library.
     VStabiliser.cpp -------------- Source code file of the library.
@@ -160,7 +158,7 @@ public:
 
 ## getVersion method
 
-**getVersion()** method return string of current version of **VStabiliser** class. Method declaration:
+The **getVersion()** method return string of current version of **VStabiliser** class. Method declaration:
 
 ```cpp
 static std::string getVersion();
@@ -175,14 +173,14 @@ cout << "VStabiliser class version: " << VStabiliser::getVersion() << endl;
 Console output:
 
 ```bash
-VStabiliser class version: 2.4.1
+VStabiliser class version: 2.4.3
 ```
 
 
 
 ## initVStabiliser method
 
-**initVStabiliser(...)** method initializes video stabiliser parameters by parameters structure. Method copy all video stabiliser parameter to internal variables. Method declaration:
+The **initVStabiliser(...)** method initializes video stabiliser parameters by parameters structure. Method copy all video stabiliser parameter to internal variables. Method declaration:
 
 ```cpp
 virtual bool initVStabiliser(VStabiliserParams& params) = 0;
@@ -190,7 +188,7 @@ virtual bool initVStabiliser(VStabiliserParams& params) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| params    | Parameters class (see  [**VStabiliserParams class**](#VStabiliserParams-class-description) description). |
+| params    | Parameters class (see  [VStabiliserParams](#vstabiliserparams-class-description) class description). |
 
 **Returns:** TRUE if params was accepted or FALSE if not.
 
@@ -198,7 +196,7 @@ virtual bool initVStabiliser(VStabiliserParams& params) = 0;
 
 ## setParam method
 
-**setParam(...)** method intended to change video stabiliser parameter. The particular implementation of the video stabiliser must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
+The **setParam(...)** method intended to change video stabiliser parameter. The particular implementation of the video stabiliser must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
@@ -206,7 +204,7 @@ virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
+| id        | Parameter ID according to [VStabiliserParam](#vstabiliserparam-enum) enum. |
 | value     | Parameter value. Depends on parameter ID.                    |
 
 **Returns:** TRUE if param was accepted or FALSE if not.
@@ -215,7 +213,7 @@ virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 
 ## getParam method
 
-**getParam(...)** method intended to get video stabiliser parameter value. The particular implementation of the video stabiliser must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
+The **getParam(...)** method intended to get video stabiliser parameter value. The particular implementation of the video stabiliser must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
@@ -223,7 +221,7 @@ virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
+| id        | Parameter ID according to [VStabiliserParam](#vstabiliserparam-enum) enum. |
 
 **Returns:** Parameter value or **-1** if this param not supported by implementation.
 
@@ -231,7 +229,7 @@ virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
 
 ## getParams method
 
-**getParams(...)** method designed to obtain all video stabiliser parameters. The particular implementation of the video stabiliser must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
+The **getParams(...)** method designed to obtain all video stabiliser parameters. The particular implementation of the video stabiliser must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual void getParams(VStabiliserParams& params) = 0;
@@ -239,13 +237,13 @@ virtual void getParams(VStabiliserParams& params) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| params    | Video stabiliser parameters class object (VStabiliserParams). |
+| params    | [VStabiliserParams](#vstabiliserparams-class-description) class object. |
 
 
 
 ## executeCommand method
 
-**executeCommand(...)** method intended to execute video stabiliser command. The particular implementation of the video stabiliser must provide thread-safe **executeCommand(...)** method call. This means that the **executeCommand(...)** method can be safely called from any thread. Method declaration:
+The **executeCommand(...)** method intended to execute video stabiliser command. The particular implementation of the video stabiliser must provide thread-safe **executeCommand(...)** method call. This means that the **executeCommand(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
@@ -253,7 +251,7 @@ virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| id        | Command ID according to [**VStabiliserCommand enum**](#VStabiliserCommand-enum). |
+| id        | Command ID according to [VStabiliserCommand](#vstabilisercommand-enum) enum. |
 
 **Returns:** TRUE if the command executed or FALSE if not.
 
@@ -261,7 +259,7 @@ virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
 
 ## stabilise method
 
-**stabilise(...)** method performs video stabilisation. Method declaration:
+The **stabilise(...)** method performs video stabilization. Method declaration:
 
 ```cpp
 virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
@@ -269,8 +267,8 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) class). Particular implementation can support all, only one or few pixel formats listed in [**Frame**](https://github.com/ConstantRobotics-Ltd/Frame) class description. |
-| dst       | Result frame. The pixel format of the result frame must be the same as source frame. If stabilisation disabled (param **MODE** set to 0) the library must copy data from source frame to result frame. |
+| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [Frame](https://github.com/ConstantRobotics-Ltd/Frame) class). Particular implementation can support all, only one or few pixel formats listed in [Frame](https://github.com/ConstantRobotics-Ltd/Frame) class description. |
+| dst       | Result frame. The pixel format of the result frame must be the same as source frame. If stabilization disabled (param **MODE** set to 0) the library must copy data from source frame to result frame. |
 
 **Returns:** TRUE if video frame processed or FALSE in case any errors.
 
@@ -278,7 +276,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 ## getOffsets methods
 
-**getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (radians) implemented to last processed video frame (**stabilise** method). The particular implementation of the video stabiliser must provide thread-safe **getOffsets(...)** method call. This means that the **getOffsets(...)** method can be safely called from any thread. Method declaration:
+The **getOffsets(...)** method returns horizontal offset (pixels), vertical offset (pixels) and rotation angle (radians) implemented to last processed video frame (**stabilise** method). The particular implementation of the video stabiliser must provide thread-safe **getOffsets(...)** method call. This means that the **getOffsets(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
@@ -294,7 +292,7 @@ virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
 
 ## encodeSetParamCommand method
 
-**encodeSetParamCommand(...)** static method designed to encode command to change any parameters of remote video stabiliser. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** class contains static methods for encoding the control commands. The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). **encodeSetParamCommand(...)** designed to encode SET_PARAM command. Method declaration:
+The **encodeSetParamCommand(...)** static method designed to encode command to change any parameters of remote video stabiliser. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** class contains static methods for encoding the control commands. The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). **encodeSetParamCommand(...)** designed to encode SET_PARAM command. Method declaration:
 
 ```cpp
 static void encodeSetParamCommand(uint8_t* data, int& size, VStabiliserParam id, float value);
@@ -304,24 +302,8 @@ static void encodeSetParamCommand(uint8_t* data, int& size, VStabiliserParam id,
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to data buffer for encoded command. Must have size >= 11. |
 | size      | Size of encoded data. Will be 11 bytes.                      |
-| id        | Parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). |
+| id        | Parameter ID according to [VStabiliserParam](#vstabiliserparam-enum) enum. |
 | value     | Parameter value.                                             |
-
-**SET_PARAM** command format (11 bytes):
-
-| Byte | Value | Description                                        |
-| ---- | ----- | -------------------------------------------------- |
-| 0    | 0x01  | SET_PARAM command header value.                    |
-| 1    | 0x02  | Major version of VStabiliser class.                |
-| 2    | 0x03  | Minor version of VStabiliser class.                |
-| 3    | id    | Parameter ID **int32_t** in Little-endian format.  |
-| 4    | id    | Parameter ID **int32_t** in Little-endian format.  |
-| 5    | id    | Parameter ID **int32_t** in Little-endian format.  |
-| 6    | id    | Parameter ID **int32_t** in Little-endian format.  |
-| 7    | value | Parameter value **float** in Little-endian format. |
-| 8    | value | Parameter value **float** in Little-endian format. |
-| 9    | value | Parameter value **float** in Little-endian format. |
-| 10   | value | Parameter value **float** in Little-endian format. |
 
 **encodeSetParamCommand(...)** is static and used without **VStabiliser** class instance. This method used on client side (control system). Example:
 
@@ -340,7 +322,7 @@ VStabiliser::encodeSetParamCommand(data, size, VStabiliserParam::INSTANT_X_OFFSE
 
 ## encodeCommand method
 
-**encodeCommand(...)** static method designed to encode video stabiliser action command. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** class contains static methods for encoding the control commands. The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). **encodeCommand(...)** designed to encode COMMAND command (action command). Method declaration:
+The **encodeCommand(...)** static method designed to encode video stabiliser action command. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** class contains static methods for encoding the control commands. The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). **encodeCommand(...)** designed to encode COMMAND command (action command). Method declaration:
 
 ```cpp
 static void encodeCommand(uint8_t* data, int& size, VStabiliserCommand id);
@@ -350,19 +332,7 @@ static void encodeCommand(uint8_t* data, int& size, VStabiliserCommand id);
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to data buffer for encoded command. Must have size >= 11. |
 | size      | Size of encoded data. Will be 7 bytes.                       |
-| id        | Command ID according to [**VStabiliserCommand enum**](#VStabiliserCommand-enum). |
-
-**COMMAND** format (7 bytes):
-
-| Byte | Value | Description                                     |
-| ---- | ----- | ----------------------------------------------- |
-| 0    | 0x00  | SET_PARAM command header value.                 |
-| 1    | 0x02  | Major version of VStabiliser class.             |
-| 2    | 0x03  | Minor version of VStabiliser class.             |
-| 3    | id    | Command ID **int32_t** in Little-endian format. |
-| 4    | id    | Command ID **int32_t** in Little-endian format. |
-| 5    | id    | Command ID **int32_t** in Little-endian format. |
-| 6    | id    | Command ID **int32_t** in Little-endian format. |
+| id        | Command ID according to [VStabiliserCommand](#vstabilisercommand-enum) enum. |
 
 **encodeCommand(...)** is static and used without **VStabiliser** class instance. This method used on client side (control system). Encoding example:
 
@@ -379,7 +349,7 @@ VStabiliser::encodeCommand(data, size, VStabiliserCommand::ON);
 
 ## decodeCommand method
 
-**decodeCommand(...)** static method designed to decode command on video stabiliser side. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** interface class contains static method to decode input command (commands should be encoded by methods **encodeSetParamsCommand(...)** or **encodeCommand(...)**). The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). Method declaration:
+The **decodeCommand(...)** static method designed to decode command on video stabiliser side. To control a stabiliser remotely, the developer has to develop his own protocol and according to it encode the command and deliver it over the communication channel. To simplify this, the **VStabiliser** interface class contains static method to decode input command (commands should be encoded by methods **encodeSetParamsCommand(...)** or **encodeCommand(...)**). The **VStabiliser** class provides two types of commands: a parameter change command (SET_PARAM) and an action command (COMMAND). Method declaration:
 
 ```cpp
 static int decodeCommand(uint8_t* data, int size, VStabiliserParam& paramId, VStabiliserCommand& commandId, float& value);
@@ -389,8 +359,8 @@ static int decodeCommand(uint8_t* data, int size, VStabiliserParam& paramId, VSt
 | --------- | ------------------------------------------------------------ |
 | data      | Pointer to input command.                                    |
 | size      | Size of command. Should be 11 bytes (for SET_PARAMS) or 7 bytes for (COMMAND). |
-| paramId   | Video stabiliser parameter ID according to [**VStabiliserParam enum**](#VStabiliserParam-enum). After decoding SET_PARAM command the method will return parameter ID. |
-| commandId | Video stabiliser command ID according to[**VStabiliserCommand enum**](#VStabiliserCommand-enum). After decoding COMMAND the method will return command ID. |
+| paramId   | Video stabiliser parameter ID according to [VStabiliserParam](#vstabiliserparam-enum) enum. After decoding SET_PARAM command the method will return parameter ID. |
+| commandId | Video stabiliser command ID according to[VStabiliserCommand](#vstabilisercommand-enum) enum. After decoding COMMAND the method will return command ID. |
 | value     | Video stabiliser parameter value after decoding SET_PARAM command. |
 
 **Returns:** **0** - in case decoding COMMAND, **1** - in case decoding SET_PARAM command or **-1** in case errors.
@@ -418,7 +388,7 @@ if (VStabiliser::decodeCommand(data, size, paramId, commandId, value) != 0)
 
 ## decodeAndExecuteCommand method
 
-**decodeAndExecuteCommand(...)** method decodes and executes command on video stabiliser side. The particular implementation of the video stabiliser must provide thread-safe **decodeAndExecuteCommand(...)** method call. This means that the **decodeAndExecuteCommand(...)** method can be safely called from any thread. Method declaration:
+The **decodeAndExecuteCommand(...)** method decodes and executes command on video stabiliser side. The particular implementation of the video stabiliser must provide thread-safe **decodeAndExecuteCommand(...)** method call. This means that the **decodeAndExecuteCommand(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
@@ -461,29 +431,29 @@ enum class VStabiliserParam
     /// compensate only A_OFFSET_LIMIT angle.
     A_OFFSET_LIMIT,
     /// Horizontal smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilization
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     X_FILTER_COEFF,
     /// Vertical smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilization
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     Y_FILTER_COEFF,
     /// Rotational smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilization
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     A_FILTER_COEFF,
-    /// Stabilisation mode:
-    /// 0 - Stabilisation off. The library should just copy input image.
-    /// 1 - Stabilisation on.
+    /// Stabilization mode:
+    /// 0 - Stabilization off. The library should just copy input image.
+    /// 1 - Stabilization on.
     MODE,
     /// Transparent border mode:
     /// 0 - Not transparent borders (black borders).
@@ -509,9 +479,9 @@ enum class VStabiliserParam
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
-    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
-    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
-    /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
+    /// 0 - 2D type 1. Stabilization only on horizontal and vertical.
+    /// 1 - 2D type 2. Stabilization only on horizontal and vertical.
+    /// 2 - 3D. Stabilization on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     TYPE,
     /// Cat frequency, Hz. Stabiliser will block vibrations with frequency
@@ -535,10 +505,10 @@ enum class VStabiliserParam
 | X_OFFSET_LIMIT                            | Maximum horizontal image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only X_OFFSET_LIMIT shift. |
 | Y_OFFSET_LIMIT                            | Maximum vertical image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only Y_OFFSET_LIMIT shift. |
 | A_OFFSET_LIMIT                            | Maximum rotational image angle in radians per video frame. If image absolute rotational angle bigger than this limit the library should compensate only A_OFFSET_LIMIT angle. |
-| X_FILTER_COEFF                            | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
-| Y_FILTER_COEFF                            | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
-| A_FILTER_COEFF                            | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
-| MODE                                      | Stabilisation mode: 0 - Stabilisation off. The library should just copy input image. 1 - Stabilisation on. |
+| X_FILTER_COEFF                            | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilization algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| Y_FILTER_COEFF                            | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilization algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| A_FILTER_COEFF                            | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilization algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| MODE                                      | Stabilization mode: 0 - Stabilization off. The library should just copy input image. 1 - Stabilization on. |
 | TRANSPARENT_BORDER                        | Transparent border mode:<br/>0 - Not transparent borders (black borders).<br/>1 - Transparent borders (parts of previous images). Particular implementation can have additional modes. |
 | CONST_X_OFFSET                            | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
 | CONST_Y_OFFSET                            | Constant vertical image offset in pixels. The library should add this offset to each processed video frame. |
@@ -546,7 +516,7 @@ enum class VStabiliserParam
 | INSTANT_X_OFFSET                          | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. |
 | INSTANT_Y_OFFSET                          | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. |
 | INSTANT_A_OFFSET                          | Instant (for one frame) rotational angle in radians. The library should add this offset to next processed video frame. |
-| TYPE                                      | Algorithm type. Particular implementation can have unique values. Default values:<br/>0 - 2D. Stabilisation only on horizonatal and vertical directions.<br/>1 - 3D. Stabilisation on horizontal and vertical directions + rotation. |
+| TYPE                                      | Algorithm type. Particular implementation can have unique values. Default values:<br/>0 - 2D. Stabilization only on horizontal and vertical directions.<br/>1 - 3D. Stabilization on horizontal and vertical directions + rotation. |
 | CUT_FREQUENCY_HZ                          | Cat frequency, Hz. Stabiliser will block vibrations with frequency CUT_FREQUENCY_HZ. |
 | FPS                                       | Frames per second of input video.                            |
 | PROCESSING_TIME_MKS (Read only parameter) | Processing time, mks. Processing time for last video frame.  |
@@ -596,7 +566,7 @@ class VStabiliserParams
 public:
     /// Scale factor. Value depends on implementation. Default:
     /// If 1 the library will process original frame size, if 2
-    /// the library will scale original frane size by 2, if 3 - by 3.
+    /// the library will scale original frame size by 2, if 3 - by 3.
     int scaleFactor{1};
     /// Maximum horizontal image shift in pixels per video frame. If image shift
     /// bigger than this limit the library should compensate only xOffsetLimit
@@ -611,21 +581,21 @@ public:
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
     /// Horizontal smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     float xFilterCoeff{0.9f};
     /// Vertical smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     float yFilterCoeff{0.9f};
     /// Rotational smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
@@ -654,8 +624,8 @@ public:
     /// should add this offset to next processed video frame.
     float instantAOffset{0.0f};
     /// Algorithm type. Default values:
-    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
-    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
+    /// 0 - 2D type 1. Stabilisation only on horizontal and vertical.
+    /// 1 - 2D type 2. Stabilisation only on horizontal and vertical.
     /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     int type{2};
@@ -691,13 +661,13 @@ public:
 
 | Field                                   | type  | Description                                                  |
 | --------------------------------------- | ----- | ------------------------------------------------------------ |
-| scaleFactor                             | int   | Scale factor. Value depends on implementation. Default: If 1 the library will process original frame size, if 2 the library will scale original frane size by 2, if 3 - by 3. |
+| scaleFactor                             | int   | Scale factor. Value depends on implementation. Default: If 1 the library will process original frame size, if 2 the library will scale original frame size by 2, if 3 - by 3. |
 | xOffsetLimit                            | int   | Maximum horizontal image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only xOffsetLimit shift. |
 | yOffsetLimit                            | int   | Maximum vertical image shift in pixels per video frame. If image shift bigger than this limit the library should compensate only yOffsetLimit shift. |
 | aOffsetLimit                            | float | Maximum rotational image angle in radians per video frame. If image absolute rotational angle bigger than this limit the library should compensate only aOffsetLimit angle. |
-| xFilterCoeff                            | float | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
-| yFilterCoeff                            | float | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
-| aFilterCoeff                            | float | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stibilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| xFilterCoeff                            | float | Horizontal smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| yFilterCoeff                            | float | Vertical smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
+| aFilterCoeff                            | float | Rotational smoothing coefficient of constant camera movement. The range of values depends on the specific implementation of the stabilisation algorithm. Default values [0-1]: 0 - the library will not compensate for constant camera motion, video will not be stabilized, 1 - no smoothing of constant camera motion (the library will compensate for the current picture drift completely without considering constant motion). |
 | enable                                  | bool  | Enable/disable stabilisation.                                |
 | transparentBorder                       | bool  | Enable/disable transparent borders.                          |
 | constXOffset                            | int   | Constant horizontal image offset in pixels. The library should add this offset to each processed video frame. |
@@ -706,13 +676,13 @@ public:
 | instantXOffset                          | int   | Instant (for one frame) horizontal image offset in pixels. The library should add this offset to next processed video frame. |
 | instantYOffset                          | int   | Instant (for one frame) vertical image offset in pixels. The library should add this offset to next processed video frame. |
 | instantAOffset                          | int   | Instant (for one frame) rotational angle in radians. The library should add this offset to next processed video frame. |
-| type                                    | int   | Algorithm type. Default values: 0 - 2D type 1. Stabilisation only on horizonatal and vertical. 1 - 2D type 2. Stabilisation only on horizonatal and vertical. 2 - 3D. Stabilisation on horizontal and vertical + rotation. Particular implementation can have unique values. |
+| type                                    | int   | Algorithm type. Default values: 0 - 2D type 1. Stabilization only on horizontal and vertical. 1 - 2D type 2. Stabilization only on horizontal and vertical. 2 - 3D. Stabilization on horizontal and vertical + rotation. Particular implementation can have unique values. |
 | cutFrequencyHz                          | float | Cat frequency, Hz. Stabiliser will block vibrations with frequency > cutFrequencyHz. |
 | fps                                     | float | Frames per second of input video.                            |
 | processingTimeMks (read only parameter) | int   | Processing time, mks. Processing time for last video frame.  |
 | logMod                                  | int   | Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal, 3 - File and terminal. |
 
-**None:** *VStabiliserParams class fiellds listed in Table 4 **must** reflect params set/get by methods setParam(...) and getParam(...).*
+**None:** *VStabiliserParams class fields listed in Table 4 **must** reflect params set/get by methods setParam(...) and getParam(...).*
 
 
 
@@ -951,7 +921,7 @@ SET(${PARENT}_SUBMODULE_VSTABILISER                     ON  CACHE BOOL "" FORCE)
 if (${PARENT}_SUBMODULE_VSTABILISER)
     SET(${PARENT}_VSTABILISER                           ON  CACHE BOOL "" FORCE)
     SET(${PARENT}_VSTABILISER_TEST                      OFF CACHE BOOL "" FORCE)
-    SET(${PARENT}_VSTABILISER_EXECUTE                   OFF CACHE BOOL "" FORCE)
+    SET(${PARENT}_VSTABILISER_EXAMPLE                   OFF CACHE BOOL "" FORCE)
 endif()
 
 ################################################################################
@@ -994,7 +964,7 @@ Done!
 
 # How to make custom implementation
 
-The **VStabiliser** class provides only an interface, data structures, and methods for encoding and decoding commands and params. To create your own implementation of the video stabiliser, you must include the VStabiliser repository in your project (see [**Build and connect to your project**](#Build-and-connect-to-your-project) section). The catalogue **example** (see [**Library files**](#Library-files) section) includes an example of the design of the custom video stabiliser. You must implement all the methods of the VStabiliser interface class. Custom video stabiliser class declaration:
+The **VStabiliser** class provides only an interface, data structures, and methods for encoding and decoding commands and params. To create your own implementation of the video stabiliser, you must include the VStabiliser repository in your project (see [Build and connect to your project](#build-and-connect-to-your-project) section). The catalogue **example** (see [Library files](#library-files) section) includes an example of the design of the custom video stabiliser. You must implement all the methods of the VStabiliser interface class. Custom video stabiliser class declaration:
 
 ```cpp
 class CustomVStabiliser: public VStabiliser
@@ -1040,4 +1010,3 @@ private:
     VStabiliserParams m_params;
 };
 ```
-

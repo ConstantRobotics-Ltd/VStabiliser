@@ -49,7 +49,7 @@ class VStabiliserParams
 public:
     /// Scale factor. Value depends on implementation. Default:
     /// If 1 the library will process original frame size, if 2
-    /// the library will scale original frane size by 2, if 3 - by 3.
+    /// the library will scale original frame size by 2, if 3 - by 3.
     int scaleFactor{1};
     /// Maximum horizontal image shift in pixels per video frame. If image shift
     /// bigger than this limit the library should compensate only xOffsetLimit
@@ -64,21 +64,21 @@ public:
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
     /// Horizontal smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     float xFilterCoeff{0.9f};
     /// Vertical smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     float yFilterCoeff{0.9f};
     /// Rotational smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
@@ -107,8 +107,8 @@ public:
     /// should add this offset to next processed video frame.
     float instantAOffset{0.0f};
     /// Algorithm type. Default values:
-    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
-    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
+    /// 0 - 2D type 1. Stabilisation only on horizontal and vertical.
+    /// 1 - 2D type 2. Stabilisation only on horizontal and vertical.
     /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     int type{2};
@@ -192,21 +192,21 @@ enum class VStabiliserParam
     /// compensate only A_OFFSET_LIMIT angle.
     A_OFFSET_LIMIT,
     /// Horizontal smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     X_FILTER_COEFF,
     /// Vertical smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
     /// picture drift completely without considering constant motion).
     Y_FILTER_COEFF,
     /// Rotational smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stibilisation
+    /// of values depends on the specific implementation of the stabilisation
     /// algorithm. Default values [0-1]: 0 - the library will not compensate for
     /// constant camera motion, video will not be stabilized, 1 - no smoothing
     /// of constant camera motion (the library will compensate for the current
@@ -240,8 +240,8 @@ enum class VStabiliserParam
     /// should add this offset to next processed video frame.
     INSTANT_A_OFFSET,
     /// Algorithm type. Default values:
-    /// 0 - 2D type 1. Stabilisation only on horizonatal and vertical.
-    /// 1 - 2D type 2. Stabilisation only on horizonatal and vertical.
+    /// 0 - 2D type 1. Stabilisation only on horizontal and vertical.
+    /// 1 - 2D type 2. Stabilisation only on horizontal and vertical.
     /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     TYPE,
