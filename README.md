@@ -1,10 +1,10 @@
-![vstabiliser_web_logo](_static/vstabiliser_web_logo.png)
+![vstabiliser_web_logo](./static/vstabiliser_web_logo.png)
 
 
 
 # **VStabiliser interface C++ library**
 
-**v2.4.3**
+**v2.4.4**
 
 
 
@@ -42,7 +42,7 @@
 
 # Overview
 
-**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilization algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabiliser classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([VStabiliserCommand](#vstabilisercommand-enum) enum, [VStabiliserParam](#vstabiliserparam-enum) enum and [VStabiliserParams](#vstabiliserparams-class-description) class) and **VStabiliser** class declaration. [VStabiliserCommand](#vstabilisercommand-enum) enum contains IDs of commands supported by **VStabiliser** class. [VStabiliserParam](#vstabiliserparam-enum) enum contains IDs of params supported by **VStabiliser** class. [VStabiliserParams](#vstabiliserparams-class-description) class contains fields for video stabilizer params values and provides methods to encode/decode and read/write params from JSON file. All video stabilizers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [Frame](https://github.com/ConstantRobotics-Ltd/Frame) (video frame data structure) and [ConfigReader](https://github.com/ConstantRobotics-Ltd/Frame) (provides methods to read/write JSON config files). It uses C++17 standard. The library is licensed under the **Apache 2.0** license.
+**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilization algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabilizer classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([VStabiliserCommand](#vstabilisercommand-enum) enum, [VStabiliserParam](#vstabiliserparam-enum) enum and [VStabiliserParams](#vstabiliserparams-class-description) class) and **VStabiliser** class declaration. [VStabiliserCommand](#vstabilisercommand-enum) enum contains IDs of commands supported by **VStabiliser** class. [VStabiliserParam](#vstabiliserparam-enum) enum contains IDs of params supported by **VStabiliser** class. [VStabiliserParams](#vstabiliserparams-class-description) class contains fields for video stabilizer params values and provides methods to encode/decode and read/write params from JSON file. All video stabilizers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) (describes video frame data structure, source code included, Apache 2.0 license) and [ConfigReader](https://rapidpixel.constantrobotics.com/docs/service-libraries/config-reader.html) (provides methods to read/write JSON config files, source code included, Apache 2.0 license). It uses C++17 standard. The library is licensed under the **Apache 2.0** license.
 
 
 
@@ -73,8 +73,8 @@ The library supplied by source code only. The user would be given a set of files
 CMakeLists.txt ------------------- Main CMake file of the library.
 3rdparty ------------------------- Folder with third-party libraries.
     CMakeLists.txt --------------- CMake file which includes third-party. libraries.
-    ConfigReader ----------------- Source code of the ConfigReader library.
-    Frame ------------------------ Source code of the Frame library.
+    ConfigReader ----------------- Folder with ConfigReader library source code.
+    Frame ------------------------ Folder with Frame library source code.
 example -------------------------- Folder with custom video stabilizer class.
     CMakeLists.txt --------------- CMake file for custom video stabilizer class.
     CustomVStabiliser.cpp -------- Source code file of the CustomVStabiliser class.
@@ -173,14 +173,14 @@ cout << "VStabiliser class version: " << VStabiliser::getVersion() << endl;
 Console output:
 
 ```bash
-VStabiliser class version: 2.4.3
+VStabiliser class version: 2.4.4
 ```
 
 
 
 ## initVStabiliser method
 
-The **initVStabiliser(...)** method initializes video stabiliser parameters by parameters structure. Method copy all video stabiliser parameter to internal variables. Method declaration:
+The **initVStabiliser(...)** method initializes video stabilizer parameters by parameters structure. Method copy all video stabilizer parameter to internal variables. Method declaration:
 
 ```cpp
 virtual bool initVStabiliser(VStabiliserParams& params) = 0;
@@ -196,7 +196,7 @@ virtual bool initVStabiliser(VStabiliserParams& params) = 0;
 
 ## setParam method
 
-The **setParam(...)** method intended to change video stabiliser parameter. The particular implementation of the video stabiliser must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
+The **setParam(...)** method intended to change video stabilizer parameter. The particular implementation of the video stabilizer must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
@@ -213,7 +213,7 @@ virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 
 ## getParam method
 
-The **getParam(...)** method intended to get video stabiliser parameter value. The particular implementation of the video stabiliser must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
+The **getParam(...)** method intended to get video stabilizer parameter value. The particular implementation of the video stabilizer must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
@@ -229,7 +229,7 @@ virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
 
 ## getParams method
 
-The **getParams(...)** method designed to obtain all video stabiliser parameters. The particular implementation of the video stabiliser must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
+The **getParams(...)** method designed to obtain all video stabilizer parameters. The particular implementation of the video stabilizer must provide thread-safe **getParams(...)** method call. This means that the **getParams(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual void getParams(VStabiliserParams& params) = 0;
@@ -243,7 +243,7 @@ virtual void getParams(VStabiliserParams& params) = 0;
 
 ## executeCommand method
 
-The **executeCommand(...)** method intended to execute video stabiliser command. The particular implementation of the video stabiliser must provide thread-safe **executeCommand(...)** method call. This means that the **executeCommand(...)** method can be safely called from any thread. Method declaration:
+The **executeCommand(...)** method intended to execute video stabilizer command. The particular implementation of the video stabiliser must provide thread-safe **executeCommand(...)** method call. This means that the **executeCommand(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
 virtual bool executeCommand(cr::vstab::VStabiliserCommand id) = 0;
@@ -267,7 +267,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [Frame](https://github.com/ConstantRobotics-Ltd/Frame) class). Particular implementation can support all, only one or few pixel formats listed in [Frame](https://github.com/ConstantRobotics-Ltd/Frame) class description. |
+| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) class). Particular implementation can support all, only one or few pixel formats listed in [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) class description. |
 | dst       | Result frame. The pixel format of the result frame must be the same as source frame. If stabilization disabled (param **MODE** set to 0) the library must copy data from source frame to result frame. |
 
 **Returns:** TRUE if video frame processed or FALSE in case any errors.
