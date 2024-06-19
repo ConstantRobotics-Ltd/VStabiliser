@@ -40,7 +40,7 @@ file (GLOB_RECURSE CPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 set  (SOURCES ${CPP_FILES} ${H_FILES})
 # create lib from src
 if (NOT TARGET ${PROJECT_NAME})
-    add_library(${PROJECT_NAME} STATIC ${SOURCES})
+    add_library(${PROJECT_NAME} ${SOURCES})
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
