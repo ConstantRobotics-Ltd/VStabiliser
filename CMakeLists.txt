@@ -23,6 +23,10 @@ else()
     SET(REWRITE_FORCE "")
 endif()
 
+# Set default Release mode if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type defaulting to Release" FORCE)
+endif()
 
 
 ################################################################################
@@ -30,9 +34,15 @@ endif()
 ## project configuration
 ################################################################################
 SET(${PARENT}_VSTABILISER                    ON  CACHE BOOL "" ${REWRITE_FORCE})
-SET(${PARENT}_VSTABILISER_TEST               ON  CACHE BOOL "" ${REWRITE_FORCE})
-SET(${PARENT}_VSTABILISER_EXAMPLE            ON  CACHE BOOL "" ${REWRITE_FORCE})
-
+if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    SET(${PARENT}_VSTABILISER_TEST           OFF CACHE BOOL "" ${REWRITE_FORCE})
+    SET(${PARENT}_VSTABILISER_EXAMPLE        OFF CACHE BOOL "" ${REWRITE_FORCE})
+    message("${PROJECT_NAME} included as subrepository.")
+else()
+    SET(${PARENT}_VSTABILISER_TEST           ON  CACHE BOOL "" ${REWRITE_FORCE})
+    SET(${PARENT}_VSTABILISER_EXAMPLE        ON  CACHE BOOL "" ${REWRITE_FORCE})
+    message("${PROJECT_NAME} is a standalone project.")
+endif()
 
 
 ################################################################################

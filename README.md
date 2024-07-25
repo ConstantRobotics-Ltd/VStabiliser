@@ -42,7 +42,7 @@
 
 # Overview
 
-**VStabiliser** C++ library provides standard interface as well defines data structures and rules for different implementation of video stabilization algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabilizer classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([VStabiliserCommand](#vstabilisercommand-enum) enum, [VStabiliserParam](#vstabiliserparam-enum) enum and [VStabiliserParams](#vstabiliserparams-class-description) class) and **VStabiliser** class declaration. [VStabiliserCommand](#vstabilisercommand-enum) enum contains IDs of commands supported by **VStabiliser** class. [VStabiliserParam](#vstabiliserparam-enum) enum contains IDs of params supported by **VStabiliser** class. [VStabiliserParams](#vstabiliserparams-class-description) class contains fields for video stabilizer params values and provides methods to encode/decode and read/write params from JSON file. All video stabilizers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) (describes video frame data structure, source code included, Apache 2.0 license) and [ConfigReader](https://rapidpixel.constantrobotics.com/docs/service-libraries/config-reader.html) (provides methods to read/write JSON config files, source code included, Apache 2.0 license). It uses C++17 standard. The library is licensed under the **Apache 2.0** license.
+**VStabiliser** C++ library provides standard interface as well as defines data structures and rules for different implementation of video stabilization algorithms. **VStabiliser** interface class doesn't do anything, just provides interface, defines data structures and provides methods to encode/decode commands and encode/decode params. Different video stabilizer classes inherit interface form **VStabiliser** C++ class. **VStabiliser.h** file contains list of data structures ([VStabiliserCommand](#vstabilisercommand-enum) enum, [VStabiliserParam](#vstabiliserparam-enum) enum and [VStabiliserParams](#vstabiliserparams-class-description) class) and **VStabiliser** class declaration. [VStabiliserCommand](#vstabilisercommand-enum) enum contains IDs of commands supported by **VStabiliser** class. [VStabiliserParam](#vstabiliserparam-enum) enum contains IDs of params supported by **VStabiliser** class. [VStabiliserParams](#vstabiliserparams-class-description) class contains fields for video stabilizer params values and provides methods to encode/decode and read/write params from JSON file. All video stabilizers should include params and commands listed in **VStabiliser.h** file. **VStabiliser** class depends on two external libraries (included as submodule): [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) (describes video frame data structure, source code included, Apache 2.0 license) and [ConfigReader](https://rapidpixel.constantrobotics.com/docs/service-libraries/config-reader.html) (provides methods to read/write JSON config files, source code included, Apache 2.0 license). It uses C++17 standard. The library is licensed under the **Apache 2.0** license.
 
 
 
@@ -62,12 +62,13 @@
 | 2.4.1   | 14.12.2023   | - Virtual destructor added.<br />- Frame class updated.      |
 | 2.4.2   | 04.01.2024   | - GitHub compliant license added.                            |
 | 2.4.3   | 25.03.2024   | - Frame class updated.<br />- ConfigReader class updated.<br />- Documentation updated. |
+| 2.4.4   | 25.07.2024   | - CMake structure updated.                                   |
 
 
 
 # Library files
 
-The library supplied by source code only. The user would be given a set of files in the form of a CMake project (repository). The repository structure is shown below:
+The library is supplied as source code only. The user is provided with a set of files in the form of a CMake project (repository). The repository structure is shown below:
 
 ```xml
 CMakeLists.txt ------------------- Main CMake file of the library.
@@ -167,7 +168,7 @@ static std::string getVersion();
 Method can be used without **VStabiliser** class instance. Example:
 
 ```cpp
-cout << "VStabiliser class version: " << VStabiliser::getVersion() << endl;
+std::cout << "VStabiliser class version: " << VStabiliser::getVersion();
 ```
 
 Console output:
@@ -933,7 +934,7 @@ if (${PARENT}_SUBMODULE_VSTABILISER)
 endif()
 ```
 
-File **3rdparty/CMakeLists.txt** adds folder **VStabiliser** to your project and excludes test application (VStabiliser class test applications) from compiling. Your repository new structure will be:
+File **3rdparty/CMakeLists.txt** adds folder **VStabiliser** to your project and excludes test application (**VStabiliser** class test applications) from compiling (by default test applications and example are excluded from compiling if **VStabiliser** is included as sub-repository). The new structure of your repository:
 
 ```bash
 CMakeLists.txt
