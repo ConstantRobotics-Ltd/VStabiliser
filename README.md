@@ -268,7 +268,7 @@ virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
 | Parameter | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) class). Particular implementation can support all, only one or few pixel formats listed in [Frame](https://rapidpixel.constantrobotics.com/docs/service-libraries/frame.html) class description. |
+| src       | Source frame. The methods accepts only RAW frame data (not compressed pixel formats, see description of [Frame](https://rapidpixel.constantrobotics.com/docs/Service/Frame.html) class). Particular implementation can support all, only one or few pixel formats listed in [Frame](https://rapidpixel.constantrobotics.com/docs/Service/Frame.html) class description. |
 | dst       | Result frame. The pixel format of the result frame must be the same as source frame. If stabilization disabled (param **MODE** set to 0) the library must copy data from source frame to result frame. |
 
 **Returns:** TRUE if video frame processed or FALSE in case any errors.
