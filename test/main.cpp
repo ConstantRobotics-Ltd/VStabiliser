@@ -3,7 +3,7 @@
 
 
 
-/// Link namesapces.
+/// Link namespaces.
 using namespace cr::vstab;
 using namespace std;
 
@@ -148,7 +148,7 @@ bool copyTest()
     }
     if (in.transparentBorder != out.transparentBorder)
     {
-        cout << "in.trasparentBorder" << endl;
+        cout << "in.transparentBorder" << endl;
         return false;
     }
     if (in.constXOffset != out.constXOffset)
@@ -296,7 +296,7 @@ bool encodeDecodeTest()
     }
     if (in.transparentBorder != out.transparentBorder)
     {
-        cout << "in.trasparentBorder" << endl;
+        cout << "in.transparentBorder" << endl;
         return false;
     }
     if (in.constXOffset != out.constXOffset)
@@ -467,7 +467,7 @@ bool encodeDecodeWithMaskTest()
     }
     if (in.transparentBorder != out.transparentBorder)
     {
-        cout << "in.trasparentBorder" << endl;
+        cout << "in.transparentBorder" << endl;
         return false;
     }
     if (out.constXOffset != 0)
@@ -538,7 +538,7 @@ bool encodeDecodeCommandsTest()
     uint8_t data[1024];
     int size = 0;
     float outValue = (float)(rand() % 20);
-    VStabiliser::encodeCommand(data, size, VStabiliserCommand::RESET);
+    VStabiliser::encodeCommand(data, size, VStabiliserCommand::HOLD_MSEC, 1000);
 
     // Decode command.
     VStabiliserCommand commandId;
@@ -550,10 +550,10 @@ bool encodeDecodeCommandsTest()
         return false;
     }
 
-    // Checkk ID and value.
-    if (commandId != VStabiliserCommand::RESET)
+    // Check ID and value.
+    if (commandId != VStabiliserCommand::HOLD_MSEC || (float)value != 1000)
     {
-        cout << "not a VStabiliserCommand::RESER" << endl;
+        cout << "not a VStabiliserCommand::HOLD_MSEC" << endl;
         return false;
     }
 
@@ -570,7 +570,7 @@ bool encodeDecodeCommandsTest()
         return false;
     }
 
-    // Checkk ID and value.
+    // Check ID and value.
     if (paramId != VStabiliserParam::X_OFFSET_LIMIT)
     {
         cout << "not a VStabiliserParam::X_OFFSET_LIMIT" << endl;
@@ -676,7 +676,7 @@ bool jsonReadWriteTest()
     }
     if (in.transparentBorder != out.transparentBorder)
     {
-        cout << "in.trasparentBorder" << endl;
+        cout << "in.transparentBorder" << endl;
         return false;
     }
     if (in.constXOffset != out.constXOffset)

@@ -59,7 +59,7 @@ public:
     /// bigger than this limit the library should compensate only yOffsetLimit
     /// shift.
     int yOffsetLimit{150};
-    /// Maximum rotational image angle in readians per video frame. If image
+    /// Maximum rotational image angle in radians per video frame. If image
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only aOffsetLimit angle.
     float aOffsetLimit{10.0f};
@@ -86,7 +86,7 @@ public:
     float aFilterCoeff{0.9f};
     /// Enable/disable stabilisation.
     bool enable{true};
-    /// Enable/disable trasparent borders.
+    /// Enable/disable transparent borders.
     bool transparentBorder{true};
     /// Constant horizontal image offset in pixels. The library should add this
     /// offset to each processed video frame.
@@ -144,7 +144,7 @@ public:
     /**
      * @brief operator =
      * @param src Source object.
-     * @return VStabiliserParams obect.
+     * @return VStabiliserParams object.
      */
     VStabiliserParams& operator= (const VStabiliserParams& src);
 
@@ -218,7 +218,7 @@ enum class VStabiliserParam
     MODE,
     /// Transparent border mode:
     /// 0 - Not transparent borders (black borders).
-    /// 1 - Trasparent borders (parts of previous images).
+    /// 1 - Transparent borders (parts of previous images).
     /// Particular implementation can have additional modes.
     TRANSPARENT_BORDER,
     /// Constant horizontal image offset in pixels. The library should add this
@@ -264,12 +264,14 @@ enum class VStabiliserParam
  */
 enum class VStabiliserCommand
 {
-    /// Reset stabilisation algorithm.
+    /// Reset stabilisation algorithm. No params.
     RESET = 1,
-    /// Enable stabilisation. After execution parameter MODE must be set to 1.
+    /// Enable stabilisation. After execution parameter MODE must be set to 1. No params.
     ON,
-    /// Disable stabilisation. After execution parameter MODE must be set to 0.
-    OFF
+    /// Disable stabilisation. After execution parameter MODE must be set to 0. No params.
+    OFF,
+    /// Hold processing for some time. Parameter - time in milliseconds.
+    HOLD_MSEC
 };
 
 
@@ -323,20 +325,21 @@ public:
     /**
      * @brief Execute command.
      * @param id Command ID.
+     * @param value Command argument.
      * @return TRUE if the command executed or FALSE if not.
      */
-    virtual bool executeCommand(VStabiliserCommand id) = 0;
+    virtual bool executeCommand(VStabiliserCommand id, float value = 0.0f) = 0;
 
     /**
      * @brief Stabilise video frame.
-     * @param src Source vidoe frame.
+     * @param src Source video frame.
      * @param dst Result video frame.
      * @return TRUE if video frame processed or FALSE in case any errors.
      */
     virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
 
     /**
-     * @brief Get offsets: horithontal, vertical and rotation. The method must
+     * @brief Get offsets: horizontal, vertical and rotation. The method must
      * return current offsets which implemented to last processed video frame.
      * @param dX Horizontal offset.
      * @param dY Vertical offset.
@@ -358,10 +361,11 @@ public:
      * @brief Encode command.
      * @param data Pointer to data buffer. Must have size >= 11.
      * @param size Size of encoded data.
+     * @param value Parameter value.
      * @param id Command ID.
      */
     static void encodeCommand(
-            uint8_t* data, int& size, VStabiliserCommand id);
+            uint8_t* data, int& size, VStabiliserCommand id, float value = 0.0f);
 
     /**
      * @brief Decode command.
@@ -388,6 +392,3 @@ public:
 };
 }
 }
-
-
-

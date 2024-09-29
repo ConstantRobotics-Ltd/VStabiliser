@@ -458,7 +458,7 @@ void cr::vstab::VStabiliser::encodeSetParamCommand(
 
 
 void cr::vstab::VStabiliser::encodeCommand(
-        uint8_t* data, int& size, cr::vstab::VStabiliserCommand id)
+        uint8_t* data, int& size, cr::vstab::VStabiliserCommand id, float value)
 {
     // Fill header.
     data[0] = 0x00;
@@ -468,7 +468,8 @@ void cr::vstab::VStabiliser::encodeCommand(
     // Fill data.
     int commandId = (int)id;
     memcpy(&data[3], &commandId, 4);
-    size = 7;
+    memcpy(&data[7], &value, 4);
+    size = 11;
 }
 
 
@@ -478,7 +479,7 @@ int cr::vstab::VStabiliser::decodeCommand(
         cr::vstab::VStabiliserCommand& commandId, float& value)
 {
     // Check size.
-    if (size < 7)
+    if (size < 11)
         return -1;
 
     // Check version.
@@ -489,7 +490,7 @@ int cr::vstab::VStabiliser::decodeCommand(
     // Extract data.
     int id = 0;
     memcpy(&id, &data[3], 4);
-    value = 0.0f;
+    memcpy(&value, &data[7], 4);
 
     // Check command type.
     if (data[0] == 0x00)
@@ -504,21 +505,8 @@ int cr::vstab::VStabiliser::decodeCommand(
             return false;
 
         paramId = (VStabiliserParam)id;
-        memcpy(&value, &data[7], 4);
         return 1;
     }
 
     return -1;
 }
-
-
-
-
-
-
-
-
-
-
-
-

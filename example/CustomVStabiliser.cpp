@@ -253,7 +253,7 @@ void cr::vstab::CustomVStabiliser::getParams(cr::vstab::VStabiliserParams& param
 
 
 
-bool cr::vstab::CustomVStabiliser::executeCommand(VStabiliserCommand id)
+bool cr::vstab::CustomVStabiliser::executeCommand(VStabiliserCommand id, float value)
 {
     // Check command ID.
     switch (id)
@@ -267,6 +267,10 @@ bool cr::vstab::CustomVStabiliser::executeCommand(VStabiliserCommand id)
         return true;
     }
     case cr::vstab::VStabiliserCommand::OFF:
+    {
+        return true;
+    }
+    case cr::vstab::VStabiliserCommand::HOLD_MSEC:
     {
         return true;
     }

@@ -38,7 +38,7 @@ public:
     void getParams(VStabiliserParams& params);
 
     /// Execute command.
-    bool executeCommand(VStabiliserCommand id);
+    bool executeCommand(VStabiliserCommand id, float value = 0.0f);
 
     /// Stabilise video frame.
     bool stabilise(cr::video::Frame& src, cr::video::Frame& dst);
@@ -56,6 +56,3 @@ private:
 };
 }
 }
-
-
-

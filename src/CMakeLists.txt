@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.13)
 ## LIBRARY-PROJECT
 ## name and version
 ################################################################################
-project(VStabiliser VERSION 2.4.4 LANGUAGES CXX)
+project(VStabiliser VERSION 2.5.0 LANGUAGES CXX)
 
 
 
