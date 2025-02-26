@@ -191,26 +191,17 @@ enum class VStabiliserParam
     /// absolute rotational angle bigger than this limit the library should
     /// compensate only A_OFFSET_LIMIT angle.
     A_OFFSET_LIMIT,
-    /// Horizontal smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stabilisation
-    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
-    /// constant camera motion, video will not be stabilized, 1 - no smoothing
-    /// of constant camera motion (the library will compensate for the current
-    /// picture drift completely without considering constant motion).
+    /// Disturbance intensity for horizontal camera movement. The range is [0, +inf):
+    /// 0 - maximum image stability, bigger values result in less image stability
+    /// and less delay in camera following.
     X_FILTER_COEFF,
-    /// Vertical smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stabilisation
-    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
-    /// constant camera motion, video will not be stabilized, 1 - no smoothing
-    /// of constant camera motion (the library will compensate for the current
-    /// picture drift completely without considering constant motion).
+    /// Disturbance intensity for vertical camera movement. The range is [0, +inf):
+    /// 0 - maximum image stability, bigger values result in less image stability
+    /// and less delay in camera following.
     Y_FILTER_COEFF,
-    /// Rotational smoothing coefficient of constant camera movement. The range
-    /// of values depends on the specific implementation of the stabilisation
-    /// algorithm. Default values [0-1]: 0 - the library will not compensate for
-    /// constant camera motion, video will not be stabilized, 1 - no smoothing
-    /// of constant camera motion (the library will compensate for the current
-    /// picture drift completely without considering constant motion).
+    /// Disturbance intensity for camera roll movement. The range is [0, +inf):
+    /// 0 - maximum image stability, bigger values result in less image stability
+    /// and less delay in camera following.
     A_FILTER_COEFF,
     /// Stabilisation mode:
     /// 0 - Stabilisation off. The library should just copy input image.
