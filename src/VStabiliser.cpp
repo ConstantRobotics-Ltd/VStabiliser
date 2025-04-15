@@ -17,39 +17,6 @@ std::string cr::vstab::VStabiliser::getVersion()
 
 
 
-cr::vstab::VStabiliserParams &cr::vstab::VStabiliserParams::operator= (const cr::vstab::VStabiliserParams &src)
-{
-    // Check yourself.
-    if (this == &src)
-        return *this;
-
-    // Copy params.
-    scaleFactor = src.scaleFactor;
-    xOffsetLimit = src.xOffsetLimit;
-    yOffsetLimit = src.yOffsetLimit;
-    aOffsetLimit = src.aOffsetLimit;
-    xFilterCoeff = src.xFilterCoeff;
-    yFilterCoeff = src.yFilterCoeff;
-    aFilterCoeff = src.aFilterCoeff;
-    enable = src.enable;
-    transparentBorder = src.transparentBorder;
-    constXOffset = src.constXOffset;
-    constYOffset = src.constYOffset;
-    constAOffset = src.constAOffset;
-    instantXOffset = src.instantXOffset;
-    instantYOffset = src.instantYOffset;
-    instantAOffset = src.instantAOffset;
-    type = src.type;
-    cutFrequencyHz = src.cutFrequencyHz;
-    fps = src.fps;
-    processingTimeMks = src.processingTimeMks;
-    logMod = src.logMod;
-
-    return *this;
-}
-
-
-
 bool cr::vstab::VStabiliserParams::encode(
         uint8_t* data, int bufferSize, int& size, cr::vstab::VStabiliserParamsMask* mask)
 {

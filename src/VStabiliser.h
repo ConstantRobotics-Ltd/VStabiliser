@@ -142,13 +142,6 @@ public:
                   logMod);
 
     /**
-     * @brief operator =
-     * @param src Source object.
-     * @return VStabiliserParams object.
-     */
-    VStabiliserParams& operator= (const VStabiliserParams& src);
-
-    /**
      * @brief Encode params.
      * @param data Pointer to data buffer.
      * @param bufferSize Data buffer size.
