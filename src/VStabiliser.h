@@ -15,7 +15,7 @@ namespace vstab
 /**
  * @brief Video stabilizer params mask. Used to serialize VStabiliserParams.
  */
-typedef struct VStabiliserParamsMask
+struct VStabiliserParamsMask
 {
     bool scaleFactor{true};
     bool xOffsetLimit{true};
@@ -37,7 +37,7 @@ typedef struct VStabiliserParamsMask
     bool fps{true};
     bool processingTimeMks{true};
     bool logMod{true};
-} VStabiliserParamsMask;
+};
 
 
 
