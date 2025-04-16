@@ -313,10 +313,14 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
     custom2 = 0.0f;
     custom3 = 0.0f;
 
+    uint8_t maskByte1 = data[3];
+    uint8_t maskByte2 = data[4];
+    uint8_t maskByte3 = data[5];
+
     // Start of payload.
     int pos = 6;
 
-    if (isBitSet(data[3], 7))
+    if (isBitSet(maskByte1, 7))
     {
         if (dataSize < pos + sizeof(scaleFactor))
             return false;
@@ -324,7 +328,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(scaleFactor);
     }
 
-    if (isBitSet(data[3], 6))
+    if (isBitSet(maskByte1, 6))
     {
         if (dataSize < pos + sizeof(xOffsetLimit))
             return false;
@@ -332,7 +336,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(xOffsetLimit);
     }
 
-    if (isBitSet(data[3], 5))
+    if (isBitSet(maskByte1, 5))
     {
         if (dataSize < pos + sizeof(yOffsetLimit))
             return false;
@@ -340,7 +344,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(yOffsetLimit);
     }
 
-    if (isBitSet(data[3], 4))
+    if (isBitSet(maskByte1, 4))
     {
         if (dataSize < pos + sizeof(aOffsetLimit))
             return false;
@@ -348,7 +352,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(aOffsetLimit);
     }
 
-    if (isBitSet(data[3], 3))
+    if (isBitSet(maskByte1, 3))
     {
         if (dataSize < pos + sizeof(xFilterCoeff))
             return false;
@@ -356,7 +360,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(xFilterCoeff);
     }
 
-    if (isBitSet(data[3], 2))
+    if (isBitSet(maskByte1, 2))
     {
         if (dataSize < pos + sizeof(yFilterCoeff))
             return false;
@@ -364,7 +368,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(yFilterCoeff);
     }
 
-    if (isBitSet(data[3], 1))
+    if (isBitSet(maskByte1, 1))
     {
         if (dataSize < pos + sizeof(aFilterCoeff))
             return false;
@@ -372,21 +376,21 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(aFilterCoeff);
     }
 
-    if (isBitSet(data[3], 0))
+    if (isBitSet(maskByte1, 0))
     {
         if (dataSize < pos + 1)
             return false;
         enable = data[pos] == 0x00 ? false : true; pos += 1;
     }
 
-    if (isBitSet(data[4], 7))
+    if (isBitSet(maskByte2, 7))
     {
         if (dataSize < pos + 1)
             return false;
         transparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
     }
 
-    if (isBitSet(data[4], 6))
+    if (isBitSet(maskByte2, 6))
     {
         if (dataSize < pos + sizeof(constXOffset))
             return false;
@@ -394,7 +398,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(constXOffset);
     }
 
-    if (isBitSet(data[4], 5))
+    if (isBitSet(maskByte2, 5))
     {
         if (dataSize < pos + sizeof(constYOffset))
             return false;
@@ -402,7 +406,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(constYOffset);
     }
 
-    if (isBitSet(data[4], 4))
+    if (isBitSet(maskByte2, 4))
     {
         if (dataSize < pos + sizeof(constAOffset))
             return false;
@@ -410,7 +414,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(constAOffset);
     }
 
-    if (isBitSet(data[4], 3))
+    if (isBitSet(maskByte2, 3))
     {
         if (dataSize < pos + sizeof(instantXOffset))
             return false;
@@ -418,7 +422,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(instantXOffset);
     }
 
-    if (isBitSet(data[4], 2))
+    if (isBitSet(maskByte2, 2))
     {
         if (dataSize < pos + sizeof(instantYOffset))
             return false;
@@ -426,7 +430,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(instantYOffset);
     }
 
-    if (isBitSet(data[4], 1))
+    if (isBitSet(maskByte2, 1))
     {
         if (dataSize < pos + sizeof(instantAOffset))
             return false;
@@ -434,7 +438,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(instantAOffset);
     }
 
-    if (isBitSet(data[4], 0))
+    if (isBitSet(maskByte2, 0))
     {
         if (dataSize < pos + sizeof(type))
             return false;
@@ -442,7 +446,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(type);
     }
 
-    if (isBitSet(data[5], 7))
+    if (isBitSet(maskByte3, 7))
     {
         if (dataSize < pos + sizeof(cutFrequencyHz))
             return false;
@@ -450,7 +454,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(cutFrequencyHz);
     }
 
-    if (isBitSet(data[5], 6))
+    if (isBitSet(maskByte3, 6))
     {
         if (dataSize < pos + sizeof(fps))
             return false;
@@ -458,7 +462,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(fps);
     }
 
-    if (isBitSet(data[5], 5))
+    if (isBitSet(maskByte3, 5))
     {
         if (dataSize < pos + sizeof(processingTimeMks))
             return false;
@@ -466,7 +470,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(processingTimeMks);
     }
 
-    if (isBitSet(data[5], 4))
+    if (isBitSet(maskByte3, 4))
     {
         if (dataSize < pos + sizeof(logMod))
             return false;
@@ -474,7 +478,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(logMod);
     }
 
-    if (isBitSet(data[5], 3))
+    if (isBitSet(maskByte3, 3))
     {
         if (dataSize < pos + sizeof(backend))
             return false;
@@ -482,7 +486,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(backend);
     }
 
-    if (isBitSet(data[5], 2))
+    if (isBitSet(maskByte3, 2))
     {
         if (dataSize < pos + sizeof(custom1))
             return false;
@@ -490,7 +494,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(custom1);
     }
 
-    if (isBitSet(data[5], 1))
+    if (isBitSet(maskByte3, 1))
     {
         if (dataSize < pos + sizeof(custom2))
             return false;
@@ -498,7 +502,7 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
         pos += sizeof(custom2);
     }
 
-    if (isBitSet(data[5], 0))
+    if (isBitSet(maskByte3, 0))
     {
         if (dataSize < pos + sizeof(custom3))
             return false;
@@ -518,12 +522,14 @@ void cr::vstab::VStabiliser::encodeSetParamCommand(
     data[0] = 0x01;
     data[1] = VSTABILISER_MAJOR_VERSION;
     data[2] = VSTABILISER_MINOR_VERSION;
+    size = 3;
 
     // Fill data.
     int paramId = (int)id;
-    memcpy(&data[3], &paramId, 4);
-    memcpy(&data[7], &value, 4);
-    size = 11;
+    memcpy(&data[3], &paramId, sizeof(paramId));
+    size += sizeof(paramId);
+    memcpy(&data[7], &value, sizeof(value));
+    size += sizeof(value);
 }
 
 
@@ -535,12 +541,14 @@ void cr::vstab::VStabiliser::encodeCommand(
     data[0] = 0x00;
     data[1] = VSTABILISER_MAJOR_VERSION;
     data[2] = VSTABILISER_MINOR_VERSION;
+    size = 3;
 
     // Fill data.
     int commandId = (int)id;
-    memcpy(&data[3], &commandId, 4);
-    memcpy(&data[7], &value, 4);
-    size = 11;
+    memcpy(&data[3], &commandId, sizeof(commandId));
+    size += sizeof(commandId);
+    memcpy(&data[7], &value, sizeof(value));
+    size += sizeof(value);
 }
 
 
@@ -560,8 +568,8 @@ int cr::vstab::VStabiliser::decodeCommand(
 
     // Extract data.
     int id = 0;
-    memcpy(&id, &data[3], 4);
-    memcpy(&value, &data[7], 4);
+    memcpy(&id, &data[3], sizeof(id));
+    memcpy(&value, &data[7], sizeof(value));
 
     // Check command type.
     if (data[0] == 0x00)
