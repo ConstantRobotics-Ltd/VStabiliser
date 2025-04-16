@@ -316,7 +316,7 @@ public:
      * @param params Parameters class.
      * @return TRUE if params was accepted or FALSE if not.
      */
-    virtual bool initVStabiliser(VStabiliserParams& params) = 0;
+    virtual bool initVStabiliser(const VStabiliserParams& params) = 0;
 
     /**
      * @brief Set param.
