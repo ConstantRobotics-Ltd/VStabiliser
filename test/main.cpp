@@ -71,7 +71,7 @@ int main(void)
         cout << "ERROR" << endl;
     cout << endl;
 
-    return 1;
+    return 0;
 }
 
 
@@ -101,6 +101,10 @@ bool copyTest()
     in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
+    in.backend = rand() % 255;
+    in.custom1 = static_cast<float>(rand() % 255);
+    in.custom2 = static_cast<float>(rand() % 255);
+    in.custom3 = static_cast<float>(rand() % 255);
 
     // Copy params.
     VStabiliserParams out = in;
@@ -206,6 +210,26 @@ bool copyTest()
         cout << "in.logMod" << endl;
         return false;
     }
+    if (in.backend != out.backend)
+    {
+        cout << "in.backend" << endl;
+        return false;
+    }
+    if (in.custom1 != out.custom1)
+    {
+        cout << "in.custom1" << endl;
+        return false;
+    }
+    if (in.custom2 != out.custom2)
+    {
+        cout << "in.custom2" << endl;
+        return false;
+    }
+    if (in.custom3 != out.custom3)
+    {
+        cout << "in.custom3" << endl;
+        return false;
+    }
 
     return true;
 }
@@ -237,6 +261,10 @@ bool encodeDecodeTest()
     in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
+    in.backend = rand() % 255;
+    in.custom1 = static_cast<float>(rand() % 255);
+    in.custom2 = static_cast<float>(rand() % 255);
+    in.custom3 = static_cast<float>(rand() % 255);
 
     // Encode data.
     uint8_t data[1024];
@@ -354,6 +382,26 @@ bool encodeDecodeTest()
         cout << "in.logMod" << endl;
         return false;
     }
+    if (in.backend != out.backend)
+    {
+        cout << "in.backend" << endl;
+        return false;
+    }
+    if (in.custom1 != out.custom1)
+    {
+        cout << "in.custom1" << endl;
+        return false;
+    }
+    if (in.custom2 != out.custom2)
+    {
+        cout << "in.custom2" << endl;
+        return false;
+    }
+    if (in.custom3 != out.custom3)
+    {
+        cout << "in.custom3" << endl;
+        return false;
+    }
 
     return true;
 }
@@ -385,6 +433,10 @@ bool encodeDecodeWithMaskTest()
     in.fps = static_cast<float>(rand() % 255);
     in.processingTimeMks = rand() % 255;
     in.logMod = rand() % 255;
+    in.backend = rand() % 255;
+    in.custom1 = static_cast<float>(rand() % 255);
+    in.custom2 = static_cast<float>(rand() % 255);
+    in.custom3 = static_cast<float>(rand() % 255);
 
     // Prepare mask.
     VStabiliserParamsMask mask;
@@ -408,6 +460,10 @@ bool encodeDecodeWithMaskTest()
     mask.fps = false;
     mask.processingTimeMks = true;
     mask.logMod = false;
+    mask.backend = true;
+    mask.custom1 = false;
+    mask.custom2 = true;
+    mask.custom3 = false;
 
     // Encode data.
     uint8_t data[1024];
@@ -523,6 +579,26 @@ bool encodeDecodeWithMaskTest()
     if (out.logMod != 0)
     {
         cout << "in.logMod" << endl;
+        return false;
+    }
+    if (in.backend != out.backend)
+    {
+        cout << "in.backend" << endl;
+        return false;
+    }
+    if (out.custom1 != 0)
+    {
+        cout << "in.custom1" << endl;
+        return false;
+    }
+    if (in.custom2 != out.custom2)
+    {
+        cout << "in.custom2" << endl;
+        return false;
+    }
+    if (out.custom3 != 0)
+    {
+        cout << "in.custom3" << endl;
         return false;
     }
 
