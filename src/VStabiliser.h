@@ -37,6 +37,10 @@ struct VStabiliserParamsMask
     bool fps{true};
     bool processingTimeMks{true};
     bool logMod{true};
+    bool backend{true};
+    bool custom1{true};
+    bool custom2{true};
+    bool custom3{true};
 };
 
 
@@ -122,6 +126,14 @@ public:
     /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
     /// 3 - File and terminal.
     int logMod{0};
+    /// Backend. Value depends on implementation.
+    int backend{0};
+    /// Custom param 1. Value depends on implementation.
+    float custom1{0};
+    /// Custom param 2. Value depends on implementation.
+    float custom2{0};
+    /// Custom param 3. Value depends on implementation.
+    float custom3{0};
 
     JSON_READABLE(VStabiliserParams,
                   scaleFactor,
@@ -139,7 +151,11 @@ public:
                   type,
                   cutFrequencyHz,
                   fps,
-                  logMod);
+                  logMod,
+                  backend,
+                  custom1,
+                  custom2,
+                  custom3);
 
     /**
      * @brief Encode params.
@@ -247,7 +263,15 @@ enum class VStabiliserParam
     PROCESSING_TIME_MKS,
     /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
     /// 3 - File and terminal.
-    LOG_MODE
+    LOG_MODE,
+    /// Backend. Value depends on implementation.
+    BACKEND,
+    /// Custom param 1. Value depends on implementation.
+    CUSTOM_1,
+    /// Custom param 2. Value depends on implementation.
+    CUSTOM_2,
+    /// Custom param 3. Value depends on implementation.
+    CUSTOM_3
 };
 
 

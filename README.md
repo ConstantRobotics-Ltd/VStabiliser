@@ -4,7 +4,7 @@
 
 # **VStabiliser interface C++ library**
 
-**v2.5.0**
+**v2.6.0**
 
 
 
@@ -64,7 +64,7 @@
 | 2.4.3   | 25.03.2024   | - Frame class updated.<br />- ConfigReader class updated.<br />- Documentation updated. |
 | 2.4.4   | 25.07.2024   | - CMake structure updated.                                   |
 | 2.5.0   | 29.09.2024   | - Add new HOLD_MSEC action command.<br/>- Change signature of encodeCommand(...) method and executeCommand(...) method. |
-
+| 2.6.0   | 16.04.2025   | - Add new parameters. |
 
 
 # Library files
@@ -182,7 +182,7 @@ std::cout << "VStabiliser class version: " << VStabiliser::getVersion();
 Console output:
 
 ```bash
-VStabiliser class version: 2.5.0
+VStabiliser class version: 2.6.0
 ```
 
 
@@ -506,7 +506,16 @@ enum class VStabiliserParam
     PROCESSING_TIME_MKS,
     /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
     /// 3 - File and terminal.
-    LOG_MODE
+    LOG_MODE,
+    /// Backend. Value depends on implementation.
+    BACKEND,
+    /// Custom param 1. Value depends on implementation.
+    CUSTOM_1,
+    /// Custom param 2. Value depends on implementation.
+    CUSTOM_2,
+    /// Custom param 3. Value depends on implementation.
+    CUSTOM_3
+
 };
 }
 }
@@ -536,6 +545,10 @@ enum class VStabiliserParam
 | FPS                 | Frames per second of input video.                            |
 | PROCESSING_TIME_MKS | Read only. Processing time, mks. Processing time for last video frame.  |
 | LOG_MODE            | Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal, 3 - File and terminal. |
+| BACKEND             | Backend. Value depends on implementation.                   |
+| CUSTOM_1            | Custom param 1. Value depends on implementation.            |
+| CUSTOM_2            | Custom param 2. Value depends on implementation.            |
+| CUSTOM_3            | Custom param 3. Value depends on implementation.            |
 
 
 
@@ -667,14 +680,20 @@ public:
     /// Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal,
     /// 3 - File and terminal.
     int logMod{0};
+    /// Backend. Value depends on implementation.
+    int backend{0};
+    /// Custom param 1. Value depends on implementation.
+    float custom1{0};
+    /// Custom param 2. Value depends on implementation.
+    float custom2{0};
+    /// Custom param 3. Value depends on implementation.
+    float custom3{0};
 
     JSON_READABLE(VStabiliserParams, scaleFactor, xOffsetLimit, yOffsetLimit,
                   aOffsetLimit, xFilterCoeff, yFilterCoeff, aFilterCoeff,
                   enable, transparentBorder, constXOffset, constYOffset,
-                  constAOffset, type, cutFrequencyHz, fps, logMod);
-
-    /// operator =
-    VStabiliserParams& operator= (const VStabiliserParams& src);
+                  constAOffset, type, cutFrequencyHz, fps, logMod, backend,
+                  custom1, custom2, custom3);
 
     /// Encode params.
     bool encode(uint8_t* data, int bufferSize,
@@ -711,6 +730,10 @@ public:
 | fps                | float | Frames per second of input video.                            |
 | processingTimeMks  | int   | Read only. Processing time, mks. Processing time for last video frame.  |
 | logMod             | int   | Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal, 3 - File and terminal. |
+| backend            | int   | Backend. Value depends on implementation.                   |
+| custom1            | float | Custom param 1. Value depends on implementation.            |
+| custom2            | float | Custom param 2. Value depends on implementation.            |
+| custom3            | float | Custom param 3. Value depends on implementation.            |
 
 **None:** *VStabiliserParams class fields listed in Table 4 **must** reflect params set/get by methods setParam(...) and getParam(...).*
 
@@ -727,9 +750,9 @@ bool encode(uint8_t* data, int bufferSize, int& size, VStabiliserParamsMask* mas
 | Parameter  | Value                                                        |
 | ---------- | ------------------------------------------------------------ |
 | data       | Pointer to data buffer.                                      |
-| bufferSize | Data buffer size. Must have size >= 80 bytes.                |
+| bufferSize | Data buffer size. Must have size >= 96 bytes.                |
 | size       | Size of encoded data.                                        |
-| mask       | Parameters mask - pointer to **VStabiliserParamsMask** structure. **VStabiliserParamsMask** (declared in VStabiliser.h file) determines flags for each field (parameter) declared in **VStabiliserParams** class. If the user wants to exclude any parameters from serialization, he can put a pointer to the mask. If the user wants to exclude a particular parameter from serialization, he should set the corresponding flag in the VStabiliserParamsMask structure. |
+| mask       | Parameters mask - pointer to **VStabiliserParamsMask** structure. **VStabiliserParamsMask** (declared in VStabiliser.h file) determines flags for each field (parameter) declared in **VStabiliserParams** class. If the user wants to exclude any parameters from serialization, he can put a pointer to the mask. If the user wants to exclude a particular parameter from serialization, he should set the corresponding flag to false in the VStabiliserParamsMask structure. |
 
 **VStabiliserParamsMask** structure declaration:
 
@@ -738,7 +761,7 @@ namespace cr
 {
 namespace vstab
 {
-typedef struct VStabiliserParamsMask
+struct VStabiliserParamsMask
 {
     bool scaleFactor{true};
     bool xOffsetLimit{true};
@@ -760,7 +783,11 @@ typedef struct VStabiliserParamsMask
     bool fps{true};
     bool processingTimeMks{true};
     bool logMod{true};
-} VStabiliserParamsMask;
+    bool backend{true};
+    bool custom1{true};
+    bool custom2{true};
+    bool custom3{true};
+};
 }
 }
 ```
@@ -862,23 +889,28 @@ if(!outConfig.get(out, "VStabiliserParams"))
 
 ```json
 {
-    "VStabiliserParams": {
-        "aFilterCoeff": 5.0,
-        "aOffsetLimit": 13.0,
-        "constAOffset": 16.0,
-        "constXOffset": 57,
-        "constYOffset": 33,
-        "cutFrequencyHz": 161.0,
+    "VStabiliserParams": 
+    {
+        "aFilterCoeff": 224.0,
+        "aOffsetLimit": 150.0,
+        "backend": 0,
+        "constAOffset": 14.0,
+        "constXOffset": 102,
+        "constYOffset": 44,
+        "custom1": 0.0,
+        "custom2": 0.0,
+        "custom3": 0.0,
+        "cutFrequencyHz": 66.0,
         "enable": false,
-        "fps": 90.0,
-        "logMod": 99,
-        "scaleFactor": 53,
+        "fps": 143.0,
+        "logMod": 159,
+        "scaleFactor": 223,
         "transparentBorder": true,
-        "type": 208,
-        "xFilterCoeff": 76.0,
-        "xOffsetLimit": 51,
-        "yFilterCoeff": 230.0,
-        "yOffsetLimit": 244
+        "type": 48,
+        "xFilterCoeff": 252.0,
+        "xOffsetLimit": 167,
+        "yFilterCoeff": 30.0,
+        "yOffsetLimit": 249
     }
 }
 ```
