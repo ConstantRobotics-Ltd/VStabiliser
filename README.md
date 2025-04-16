@@ -64,7 +64,7 @@
 | 2.4.3   | 25.03.2024   | - Frame class updated.<br />- ConfigReader class updated.<br />- Documentation updated. |
 | 2.4.4   | 25.07.2024   | - CMake structure updated.                                   |
 | 2.5.0   | 29.09.2024   | - Add new HOLD_MSEC action command.<br/>- Change signature of encodeCommand(...) method and executeCommand(...) method. |
-| 2.6.0   | 16.04.2025   | - Add new parameters. |
+| 2.6.0   | 16.04.2025   | - Add new parameters.                                        |
 
 
 # Library files
@@ -545,10 +545,10 @@ enum class VStabiliserParam
 | FPS                 | Frames per second of input video.                            |
 | PROCESSING_TIME_MKS | Read only. Processing time, mks. Processing time for last video frame.  |
 | LOG_MODE            | Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal, 3 - File and terminal. |
-| BACKEND             | Backend. Value depends on implementation.                   |
-| CUSTOM_1            | Custom param 1. Value depends on implementation.            |
-| CUSTOM_2            | Custom param 2. Value depends on implementation.            |
-| CUSTOM_3            | Custom param 3. Value depends on implementation.            |
+| BACKEND             | Compatational backend. Value depends on implementation.      |
+| CUSTOM_1            | Custom param 1. Value depends on implementation.             |
+| CUSTOM_2            | Custom param 2. Value depends on implementation.             |
+| CUSTOM_3            | Custom param 3. Value depends on implementation.             |
 
 
 
@@ -730,10 +730,10 @@ public:
 | fps                | float | Frames per second of input video.                            |
 | processingTimeMks  | int   | Read only. Processing time, mks. Processing time for last video frame.  |
 | logMod             | int   | Logging mode. Values: 0 - Disable, 1 - Only file, 2 - Only terminal, 3 - File and terminal. |
-| backend            | int   | Backend. Value depends on implementation.                   |
-| custom1            | float | Custom param 1. Value depends on implementation.            |
-| custom2            | float | Custom param 2. Value depends on implementation.            |
-| custom3            | float | Custom param 3. Value depends on implementation.            |
+| backend            | int   | Computational Bbackend. Value depends on implementation.     |
+| custom1            | float | Custom param 1. Value depends on implementation.             |
+| custom2            | float | Custom param 2. Value depends on implementation.             |
+| custom3            | float | Custom param 3. Value depends on implementation.             |
 
 **None:** *VStabiliserParams class fields listed in Table 4 **must** reflect params set/get by methods setParam(...) and getParam(...).*
 
