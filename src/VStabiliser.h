@@ -155,7 +155,7 @@ public:
                   backend,
                   custom1,
                   custom2,
-                  custom3);
+                  custom3)
 
     /**
      * @brief Encode params.
