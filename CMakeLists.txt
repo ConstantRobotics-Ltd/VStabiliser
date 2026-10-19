@@ -50,8 +50,15 @@ endif()
 ## Adding subdirectories according to the configuration
 ################################################################################
 if (${PARENT}_VSTABILISER)
+    # If this project is a stand alone repository, its dependencies are expected
+    # to be next to it (../Frame, ../ConfigReader) and are added first. If this
+    # project is included in another one, the top-level CMakeLists.txt must add
+    # these libraries by itself.
+    if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../Frame ${CMAKE_CURRENT_BINARY_DIR}/Frame)
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ConfigReader ${CMAKE_CURRENT_BINARY_DIR}/ConfigReader)
+    endif()
     add_subdirectory(src)
-    add_subdirectory(3rdparty)
 endif()
 
 if (${PARENT}_VSTABILISER_TEST)

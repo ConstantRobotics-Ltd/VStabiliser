@@ -1,41 +1,247 @@
 #include "VStabiliser.h"
 #include "VStabiliserVersion.h"
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <string>
 
 
 
-/**
- * @brief Set or clear a bit in a byte.
- * @param byte Pointer to the byte.
- * @param cond Condition to set or clear the bit. True to set, false to clear.
- * @param bitPosition The bit position (0-7).
- */
-static inline void setOrClearBit(uint8_t *byte, bool cond, uint8_t bitPosition) 
+namespace
 {
-    if (cond)
-        *byte |= (1 << bitPosition);     // Set the bit
-    else
-        *byte &= ~(1 << bitPosition);    // Clear the bit
+// Encoded params and commands store int and float fields as raw 4 bytes
+// values (the byte order of the host).
+static_assert(sizeof(int) == 4, "int must be 4 bytes");
+static_assert(sizeof(float) == 4, "float must be 4 bytes");
+static_assert(std::numeric_limits<float>::is_iec559,
+              "float must be IEEE 754 binary32");
+
+/// Size of an int or float value in the encoded data, bytes.
+constexpr int VALUE_SIZE{4};
+/// Size of a bool value in the encoded data, bytes.
+constexpr int FLAG_SIZE{1};
+
+// Header of the encoded data (params and commands):
+// [0] - data type, [1] - major version of the library, [2] - minor version of
+// the library.
+
+/// Position of the data type in the encoded data.
+constexpr int DATA_TYPE_POS{0};
+/// Position of the major version of the library in the encoded data.
+constexpr int MAJOR_VERSION_POS{1};
+/// Position of the minor version of the library in the encoded data.
+constexpr int MINOR_VERSION_POS{2};
+/// Data type of the encoded action command (COMMAND).
+constexpr uint8_t COMMAND_DATA_TYPE{0x00};
+/// Data type of the encoded set param command (SET_PARAM).
+constexpr uint8_t SET_PARAM_DATA_TYPE{0x01};
+/// Data type of the encoded params.
+constexpr uint8_t PARAMS_DATA_TYPE{0x02};
+
+// Encoded params: header, 3 bytes of the mask which defines the fields
+// included in the payload, payload (values of the selected fields in the order
+// of the mask bits, the most significant bit of the first mask byte is the
+// first field).
+
+/// Position of the first mask byte in the encoded params.
+constexpr int PARAMS_MASK_POS{3};
+/// Size of the mask in the encoded params, bytes.
+constexpr int PARAMS_MASK_SIZE{3};
+/// Size of the encoded params header: data type, version and mask, bytes.
+constexpr int PARAMS_HEADER_SIZE{PARAMS_MASK_POS + PARAMS_MASK_SIZE};
+/// Number of bits in a mask byte.
+constexpr size_t MASK_BYTE_BITS{8};
+/// The most significant bit of a mask byte: the bit of the first field of the
+/// byte.
+constexpr unsigned int MASK_FIRST_BIT{0x80U};
+/// Number of fields (one mask bit per field).
+constexpr size_t FIELDS_NUMBER{24};
+static_assert(FIELDS_NUMBER == static_cast<size_t>(PARAMS_MASK_SIZE) *
+              MASK_BYTE_BITS, "every mask bit must be used by a field");
+/// Number of int and float fields.
+constexpr int VALUES_NUMBER{22};
+/// Number of bool fields.
+constexpr int FLAGS_NUMBER{2};
+/// Size of the encoded params with all fields included, bytes. A buffer of
+/// this size is enough for any mask.
+constexpr int PARAMS_MAX_SIZE{PARAMS_HEADER_SIZE +
+                              VALUES_NUMBER * VALUE_SIZE +
+                              FLAGS_NUMBER * FLAG_SIZE};
+static_assert(PARAMS_MAX_SIZE == 96, "wrong size of encoded params");
+static_assert(static_cast<size_t>(VALUES_NUMBER) +
+              static_cast<size_t>(FLAGS_NUMBER) == FIELDS_NUMBER,
+              "wrong number of fields");
+
+// Encoded command: header, command or param ID (int), argument or param value
+// (float).
+
+/// Position of the command or param ID in the encoded command.
+constexpr int COMMAND_ID_POS{3};
+/// Position of the command argument or param value in the encoded command.
+constexpr int COMMAND_VALUE_POS{7};
+/// Size of the encoded command of both types, bytes.
+constexpr int COMMAND_SIZE{11};
+static_assert(COMMAND_VALUE_POS + VALUE_SIZE == COMMAND_SIZE,
+              "wrong size of encoded command");
+
+/// The lowest valid command ID.
+constexpr int COMMAND_ID_MIN{
+    static_cast<int>(cr::vstab::VStabiliserCommand::RESET)};
+/// The highest valid command ID. An ID that is not in the range of the enum is
+/// rejected: the implementation must never get an unknown ID from the decoder.
+constexpr int COMMAND_ID_MAX{
+    static_cast<int>(cr::vstab::VStabiliserCommand::HOLD_MSEC)};
+/// The lowest valid param ID.
+constexpr int PARAM_ID_MIN{
+    static_cast<int>(cr::vstab::VStabiliserParam::SCALE_FACTOR)};
+/// The highest valid param ID. An ID that is not in the range of the enum is
+/// rejected.
+constexpr int PARAM_ID_MAX{
+    static_cast<int>(cr::vstab::VStabiliserParam::CUSTOM_3)};
+
+
+
+/// Location of a VStabiliserParams field in the encoded data.
+struct FieldRef
+{
+    /// Pointer to the field of a VStabiliserParams object.
+    void* value{nullptr};
+    /// Size of the field in the encoded data: VALUE_SIZE or FLAG_SIZE.
+    int size{0};
+};
+
+
+
+/// Get the table of VStabiliserParams fields in the order they are stored in
+/// the encoded data (the same order as the bits of the mask).
+std::array<FieldRef, FIELDS_NUMBER> makeFieldTable(
+        cr::vstab::VStabiliserParams& params)
+{
+    return {{
+        {&params.scaleFactor, VALUE_SIZE},
+        {&params.xOffsetLimit, VALUE_SIZE},
+        {&params.yOffsetLimit, VALUE_SIZE},
+        {&params.aOffsetLimit, VALUE_SIZE},
+        {&params.xFilterCoeff, VALUE_SIZE},
+        {&params.yFilterCoeff, VALUE_SIZE},
+        {&params.aFilterCoeff, VALUE_SIZE},
+        {&params.enable, FLAG_SIZE},
+        {&params.transparentBorder, FLAG_SIZE},
+        {&params.constXOffset, VALUE_SIZE},
+        {&params.constYOffset, VALUE_SIZE},
+        {&params.constAOffset, VALUE_SIZE},
+        {&params.instantXOffset, VALUE_SIZE},
+        {&params.instantYOffset, VALUE_SIZE},
+        {&params.instantAOffset, VALUE_SIZE},
+        {&params.type, VALUE_SIZE},
+        {&params.cutFrequencyHz, VALUE_SIZE},
+        {&params.fps, VALUE_SIZE},
+        {&params.processingTimeMks, VALUE_SIZE},
+        {&params.logMod, VALUE_SIZE},
+        {&params.backend, VALUE_SIZE},
+        {&params.custom1, VALUE_SIZE},
+        {&params.custom2, VALUE_SIZE},
+        {&params.custom3, VALUE_SIZE}
+    }};
 }
 
 
 
-/**
- * @brief Check if the bit is set in the byte.
- * @param byte The byte to check.
- * @param bitPosition The bit position to check (0-7).
- * @return TRUE if the bit is set, FALSE otherwise.
- */
-static inline bool isBitSet(uint8_t byte, uint8_t bitPosition) 
+/// Get the flags of the params mask in the same order as the table of fields.
+std::array<bool, FIELDS_NUMBER> makeMaskFlags(
+        const cr::vstab::VStabiliserParamsMask& mask)
 {
-    return (byte & (1 << bitPosition)) != 0;
+    return {{
+        mask.scaleFactor,
+        mask.xOffsetLimit,
+        mask.yOffsetLimit,
+        mask.aOffsetLimit,
+        mask.xFilterCoeff,
+        mask.yFilterCoeff,
+        mask.aFilterCoeff,
+        mask.enable,
+        mask.transparentBorder,
+        mask.constXOffset,
+        mask.constYOffset,
+        mask.constAOffset,
+        mask.instantXOffset,
+        mask.instantYOffset,
+        mask.instantAOffset,
+        mask.type,
+        mask.cutFrequencyHz,
+        mask.fps,
+        mask.processingTimeMks,
+        mask.logMod,
+        mask.backend,
+        mask.custom1,
+        mask.custom2,
+        mask.custom3
+    }};
 }
 
 
 
-cr::vstab::VStabiliser::~VStabiliser()
+/// Get the index of the mask byte (the first mask byte has index 0) which
+/// holds the bit of the field.
+constexpr int maskByteIndex(size_t field)
 {
-
+    return static_cast<int>(field / MASK_BYTE_BITS);
 }
+
+
+
+/// Get the bit of the mask byte which belongs to the field. The first field of
+/// a mask byte is the most significant bit.
+constexpr uint8_t maskBit(size_t field)
+{
+    return static_cast<uint8_t>(MASK_FIRST_BIT >> (field % MASK_BYTE_BITS));
+}
+
+
+
+/// Write the header of the encoded data: data type and version of the library.
+void encodeHeader(uint8_t* data, uint8_t dataType)
+{
+    data[DATA_TYPE_POS] = dataType;
+    data[MAJOR_VERSION_POS] = VSTABILISER_MAJOR_VERSION;
+    data[MINOR_VERSION_POS] = VSTABILISER_MINOR_VERSION;
+}
+
+
+
+/// Check that the encoded data was made by the library of the same major and
+/// minor version. The data must contain at least the header.
+bool isVersionSupported(const uint8_t* data)
+{
+    return data[MAJOR_VERSION_POS] == VSTABILISER_MAJOR_VERSION &&
+           data[MINOR_VERSION_POS] == VSTABILISER_MINOR_VERSION;
+}
+
+
+
+/// Encode a command of any type. Nothing is written and the size is 0 if the
+/// pointer is nullptr.
+void encodeCommandData(
+        uint8_t* data, int& size, uint8_t dataType, int id, float value)
+{
+    size = 0;
+    if (data == nullptr)
+    {
+        return;
+    }
+
+    encodeHeader(data, dataType);
+    std::memcpy(&data[COMMAND_ID_POS], &id, sizeof(id));
+    std::memcpy(&data[COMMAND_VALUE_POS], &value, sizeof(value));
+    size = COMMAND_SIZE;
+}
+}
+
+
+
+cr::vstab::VStabiliser::~VStabiliser() = default;
 
 
 
@@ -47,215 +253,61 @@ std::string cr::vstab::VStabiliser::getVersion()
 
 
 bool cr::vstab::VStabiliserParams::encode(
-        uint8_t* data, int bufferSize, int& size, cr::vstab::VStabiliserParamsMask* mask)
+        uint8_t* data, int bufferSize, int& size,
+        cr::vstab::VStabiliserParamsMask* mask)
 {
-    // Check buffer size. Full parameters require 96 bytes.
-    if (bufferSize < 96)
+    // The size is 0 if params are not encoded.
+    size = 0;
+
+    // Check the pointer and the buffer size. The buffer must be able to hold
+    // params with all fields even if the mask excludes some of them.
+    if (data == nullptr || bufferSize < PARAMS_MAX_SIZE)
+    {
         return false;
+    }
 
-    /// Format of the data:
-    /// [0] - Header byte (0x02)
-    /// [1] - major version of the library
-    /// [2] - minor version of the library
-    /// [3:5] - mask bytes that defines which params are included in the payload
-    /// [6:end] - Payload data.
+    // Encode header.
+    encodeHeader(data, PARAMS_DATA_TYPE);
 
-    // Encode version.
-    int pos = 0;
-    data[pos] = 0x02; pos += 1;
-    data[pos] = VSTABILISER_MAJOR_VERSION; pos += 1;
-    data[pos] = VSTABILISER_MINOR_VERSION; pos += 1;
-
-    // Prepare mask.
+    // Encode mask. All fields are encoded if the mask is not set.
+    std::array<bool, FIELDS_NUMBER> selected{};
     if (mask == nullptr)
     {
-        // Prepare mask.
-        data[pos] = 0xFF; pos += 1;
-        data[pos] = 0xFF; pos += 1;
-        data[pos] = 0xFF; pos += 1;
-
-        // Encode data.
-        memcpy(&data[pos], &scaleFactor, sizeof(scaleFactor)); pos += sizeof(scaleFactor);
-        memcpy(&data[pos], &xOffsetLimit, sizeof(xOffsetLimit)); pos += sizeof(xOffsetLimit);
-        memcpy(&data[pos], &yOffsetLimit, sizeof(yOffsetLimit)); pos += sizeof(yOffsetLimit);
-        memcpy(&data[pos], &aOffsetLimit, sizeof(aOffsetLimit)); pos += sizeof(aOffsetLimit);
-        memcpy(&data[pos], &xFilterCoeff, sizeof(xFilterCoeff)); pos += sizeof(xFilterCoeff);
-        memcpy(&data[pos], &yFilterCoeff, sizeof(yFilterCoeff)); pos += sizeof(yFilterCoeff);
-        memcpy(&data[pos], &aFilterCoeff, sizeof(aFilterCoeff)); pos += sizeof(aFilterCoeff);
-        data[pos] = enable == true ? 0x01 : 0x00; pos += 1;
-        data[pos] = transparentBorder == true ? 0x01 : 0x00; pos += 1;
-        memcpy(&data[pos], &constXOffset, sizeof(constXOffset)); pos += sizeof(constXOffset);
-        memcpy(&data[pos], &constYOffset, sizeof(constYOffset)); pos += sizeof(constYOffset);
-        memcpy(&data[pos], &constAOffset, sizeof(constAOffset)); pos += sizeof(constAOffset);
-        memcpy(&data[pos], &instantXOffset, sizeof(instantXOffset)); pos += sizeof(instantXOffset);
-        memcpy(&data[pos], &instantYOffset, sizeof(instantYOffset)); pos += sizeof(instantYOffset);
-        memcpy(&data[pos], &instantAOffset, sizeof(instantAOffset)); pos += sizeof(instantAOffset);
-        memcpy(&data[pos], &type, sizeof(type)); pos += sizeof(type);
-        memcpy(&data[pos], &cutFrequencyHz, sizeof(cutFrequencyHz)); pos += sizeof(cutFrequencyHz);
-        memcpy(&data[pos], &fps, sizeof(fps)); pos += sizeof(fps);
-        memcpy(&data[pos], &processingTimeMks, sizeof(processingTimeMks)); pos += sizeof(processingTimeMks);
-        memcpy(&data[pos], &logMod, sizeof(logMod)); pos += sizeof(logMod);
-        memcpy(&data[pos], &backend, sizeof(backend)); pos += sizeof(backend);
-        memcpy(&data[pos], &custom1, sizeof(custom1)); pos += sizeof(custom1);
-        memcpy(&data[pos], &custom2, sizeof(custom2)); pos += sizeof(custom2);
-        memcpy(&data[pos], &custom3, sizeof(custom3)); pos += sizeof(custom3);
-
-        size = pos;
-        return true;
+        selected.fill(true);
+    }
+    else
+    {
+        selected = makeMaskFlags(*mask);
+    }
+    std::memset(&data[PARAMS_MASK_POS], 0, PARAMS_MASK_SIZE);
+    for (size_t i = 0; i < FIELDS_NUMBER; ++i)
+    {
+        if (selected[i])
+        {
+            data[PARAMS_MASK_POS + maskByteIndex(i)] |= maskBit(i);
+        }
     }
 
-    // First byte of mask.
-    setOrClearBit(&data[pos], mask->scaleFactor, 7);
-    setOrClearBit(&data[pos], mask->xOffsetLimit, 6);
-    setOrClearBit(&data[pos], mask->yOffsetLimit, 5);
-    setOrClearBit(&data[pos], mask->aOffsetLimit, 4);
-    setOrClearBit(&data[pos], mask->xFilterCoeff, 3);
-    setOrClearBit(&data[pos], mask->yFilterCoeff, 2);
-    setOrClearBit(&data[pos], mask->aFilterCoeff, 1);
-    setOrClearBit(&data[pos], mask->enable, 0);
+    // Encode selected fields.
+    const auto fields = makeFieldTable(*this);
+    int pos = PARAMS_HEADER_SIZE;
+    for (size_t i = 0; i < FIELDS_NUMBER; ++i)
+    {
+        if (!selected[i])
+        {
+            continue;
+        }
 
-    // Second byte of mask.
-    pos += 1;
-    setOrClearBit(&data[pos], mask->transparentBorder, 7);
-    setOrClearBit(&data[pos], mask->constXOffset, 6);
-    setOrClearBit(&data[pos], mask->constYOffset, 5);
-    setOrClearBit(&data[pos], mask->constAOffset, 4);
-    setOrClearBit(&data[pos], mask->instantXOffset, 3);
-    setOrClearBit(&data[pos], mask->instantYOffset, 2);
-    setOrClearBit(&data[pos], mask->instantAOffset, 1);
-    setOrClearBit(&data[pos], mask->type, 0);
-
-    // Third byte of mask.
-    pos += 1;
-    setOrClearBit(&data[pos], mask->cutFrequencyHz, 7);
-    setOrClearBit(&data[pos], mask->fps, 6);
-    setOrClearBit(&data[pos], mask->processingTimeMks, 5);
-    setOrClearBit(&data[pos], mask->logMod, 4);
-    setOrClearBit(&data[pos], mask->backend, 3);
-    setOrClearBit(&data[pos], mask->custom1, 2);
-    setOrClearBit(&data[pos], mask->custom2, 1);
-    setOrClearBit(&data[pos], mask->custom3, 0);
-    
-    // Start encoding data.
-    pos += 1;
-
-    if (mask->scaleFactor)
-    {
-        memcpy(&data[pos], &scaleFactor, sizeof(scaleFactor)); 
-        pos += sizeof(scaleFactor);
-    }
-    if (mask->xOffsetLimit)
-    {
-        memcpy(&data[pos], &xOffsetLimit, sizeof(xOffsetLimit)); 
-        pos += sizeof(xOffsetLimit);
-    }
-    if (mask->yOffsetLimit)
-    {
-        memcpy(&data[pos], &yOffsetLimit, sizeof(yOffsetLimit)); 
-        pos += sizeof(yOffsetLimit);
-    }
-    if (mask->aOffsetLimit)
-    {
-        memcpy(&data[pos], &aOffsetLimit, sizeof(aOffsetLimit)); 
-        pos += sizeof(aOffsetLimit);
-    }
-    if (mask->xFilterCoeff)
-    {
-        memcpy(&data[pos], &xFilterCoeff, sizeof(xFilterCoeff)); 
-        pos += sizeof(xFilterCoeff);
-    }
-    if (mask->yFilterCoeff)
-    {
-        memcpy(&data[pos], &yFilterCoeff, sizeof(yFilterCoeff)); 
-        pos += sizeof(yFilterCoeff);
-    }
-    if (mask->aFilterCoeff)
-    {
-        memcpy(&data[pos], &aFilterCoeff, sizeof(aFilterCoeff)); 
-        pos += sizeof(aFilterCoeff);
-    }
-    if (mask->enable)
-    {
-        data[pos] = enable == true ? 0x01 : 0x00; 
-        pos += 1;
-    }
-    if (mask->transparentBorder)
-    {
-        data[pos] = transparentBorder == true ? 0x01 : 0x00; 
-        pos += 1;
-    }
-    if (mask->constXOffset)
-    {
-        memcpy(&data[pos], &constXOffset, sizeof(constXOffset)); 
-        pos += sizeof(constXOffset);
-    }
-    if (mask->constYOffset)
-    {
-        memcpy(&data[pos], &constYOffset, sizeof(constYOffset)); 
-        pos += sizeof(constYOffset);
-    }
-    if (mask->constAOffset)
-    {
-        memcpy(&data[pos], &constAOffset, sizeof(constAOffset)); 
-        pos += sizeof(constAOffset);
-    }
-    if (mask->instantXOffset)
-    {
-        memcpy(&data[pos], &instantXOffset, sizeof(instantXOffset)); 
-        pos += sizeof(instantXOffset);
-    }
-    if (mask->instantYOffset)
-    {
-        memcpy(&data[pos], &instantYOffset, sizeof(instantYOffset)); 
-        pos += sizeof(instantYOffset);
-    }
-    if (mask->instantAOffset)
-    {
-        memcpy(&data[pos], &instantAOffset, sizeof(instantAOffset)); 
-        pos += sizeof(instantAOffset);
-    }
-    if (mask->type)
-    {
-        memcpy(&data[pos], &type, sizeof(type)); pos += sizeof(type);
-    }
-    if (mask->cutFrequencyHz)
-    {
-        memcpy(&data[pos], &cutFrequencyHz, sizeof(cutFrequencyHz)); 
-        pos += sizeof(cutFrequencyHz);
-    }
-    if (mask->fps)
-    {
-        memcpy(&data[pos], &fps, sizeof(fps)); pos += sizeof(fps);
-    }
-    if (mask->processingTimeMks)
-    {
-        memcpy(&data[pos], &processingTimeMks, sizeof(processingTimeMks)); 
-        pos += sizeof(processingTimeMks);
-    }
-    if (mask->logMod)
-    {
-        memcpy(&data[pos], &logMod, sizeof(logMod)); 
-        pos += sizeof(logMod);
-    }
-    if (mask->backend)
-    {
-        memcpy(&data[pos], &backend, sizeof(backend)); 
-        pos += sizeof(backend);
-    }
-    if (mask->custom1)
-    {
-        memcpy(&data[pos], &custom1, sizeof(custom1)); 
-        pos += sizeof(custom1);
-    }
-    if (mask->custom2)
-    {
-        memcpy(&data[pos], &custom2, sizeof(custom2)); 
-        pos += sizeof(custom2);
-    }
-    if (mask->custom3)
-    {
-        memcpy(&data[pos], &custom3, sizeof(custom3)); 
-        pos += sizeof(custom3);
+        const FieldRef& field = fields[i];
+        if (field.size == FLAG_SIZE)
+        {
+            data[pos] = *static_cast<const bool*>(field.value) ? 0x01 : 0x00;
+        }
+        else
+        {
+            std::memcpy(&data[pos], field.value, VALUE_SIZE);
+        }
+        pos += field.size;
     }
 
     size = pos;
@@ -267,248 +319,57 @@ bool cr::vstab::VStabiliserParams::encode(
 
 bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
 {
-    // Check data size.
-    if (dataSize < 6)
+    // Check the pointer and the size (the header must be complete).
+    if (data == nullptr || dataSize < PARAMS_HEADER_SIZE)
+    {
         return false;
+    }
 
-    /// Format of the data:
-    /// [0] - Header byte (0x02)
-    /// [1] - major version of the library
-    /// [2] - minor version of the library
-    /// [3:5] - mask bytes that defines which params are included in the payload
-    /// [6:end] - Payload data.
-
-    // Check header.
-    if (data[0] != 0x02)
+    // Check data type.
+    if (data[DATA_TYPE_POS] != PARAMS_DATA_TYPE)
+    {
         return false;
+    }
 
     // Check version.
-    if (data[1] != VSTABILISER_MAJOR_VERSION ||
-        data[2] != VSTABILISER_MINOR_VERSION)
+    if (!isVersionSupported(data))
+    {
         return false;
-
-    // Reset the params.
-    scaleFactor = 0;
-    xOffsetLimit = 0;
-    yOffsetLimit = 0;
-    aOffsetLimit = 0.0f;
-    xFilterCoeff = 0.0f;
-    yFilterCoeff = 0.0f;
-    aFilterCoeff = 0.0f;
-    enable = false;
-    transparentBorder = false;
-    constXOffset = 0;
-    constYOffset = 0;
-    constAOffset = 0.0f;
-    instantXOffset = 0;
-    instantYOffset = 0;
-    instantAOffset = 0.0f;
-    type = 0;
-    cutFrequencyHz = 0.0f;
-    fps = 0.0f;
-    processingTimeMks = 0;
-    logMod = 0;
-    backend = 0;
-    custom1 = 0.0f;
-    custom2 = 0.0f;
-    custom3 = 0.0f;
-
-    uint8_t maskByte1 = data[3];
-    uint8_t maskByte2 = data[4];
-    uint8_t maskByte3 = data[5];
-
-    // Start of payload.
-    int pos = 6;
-
-    if (isBitSet(maskByte1, 7))
-    {
-        if (dataSize < pos + sizeof(scaleFactor))
-            return false;
-        memcpy(&scaleFactor, &data[pos], sizeof(scaleFactor)); 
-        pos += sizeof(scaleFactor);
     }
 
-    if (isBitSet(maskByte1, 6))
+    // Decode into a temporary object: this object is changed only if the
+    // whole data is valid. Fields not selected by the mask are set to zero.
+    VStabiliserParams result;
+    const auto fields = makeFieldTable(result);
+    int pos = PARAMS_HEADER_SIZE;
+    for (size_t i = 0; i < FIELDS_NUMBER; ++i)
     {
-        if (dataSize < pos + sizeof(xOffsetLimit))
+        const FieldRef& field = fields[i];
+        const bool encoded =
+                (data[PARAMS_MASK_POS + maskByteIndex(i)] & maskBit(i)) != 0;
+        if (!encoded)
+        {
+            std::memset(field.value, 0, static_cast<size_t>(field.size));
+            continue;
+        }
+
+        // Check that the field is inside the data (pos <= dataSize here).
+        if (dataSize - pos < field.size)
+        {
             return false;
-        memcpy(&xOffsetLimit, &data[pos], sizeof(xOffsetLimit)); 
-        pos += sizeof(xOffsetLimit);
+        }
+        if (field.size == FLAG_SIZE)
+        {
+            *static_cast<bool*>(field.value) = data[pos] != 0x00;
+        }
+        else
+        {
+            std::memcpy(field.value, &data[pos], VALUE_SIZE);
+        }
+        pos += field.size;
     }
 
-    if (isBitSet(maskByte1, 5))
-    {
-        if (dataSize < pos + sizeof(yOffsetLimit))
-            return false;
-        memcpy(&yOffsetLimit, &data[pos], sizeof(yOffsetLimit)); 
-        pos += sizeof(yOffsetLimit);
-    }
-
-    if (isBitSet(maskByte1, 4))
-    {
-        if (dataSize < pos + sizeof(aOffsetLimit))
-            return false;
-        memcpy(&aOffsetLimit, &data[pos], sizeof(aOffsetLimit)); 
-        pos += sizeof(aOffsetLimit);
-    }
-
-    if (isBitSet(maskByte1, 3))
-    {
-        if (dataSize < pos + sizeof(xFilterCoeff))
-            return false;
-        memcpy(&xFilterCoeff, &data[pos], sizeof(xFilterCoeff)); 
-        pos += sizeof(xFilterCoeff);
-    }
-
-    if (isBitSet(maskByte1, 2))
-    {
-        if (dataSize < pos + sizeof(yFilterCoeff))
-            return false;
-        memcpy(&yFilterCoeff, &data[pos], sizeof(yFilterCoeff)); 
-        pos += sizeof(yFilterCoeff);
-    }
-
-    if (isBitSet(maskByte1, 1))
-    {
-        if (dataSize < pos + sizeof(aFilterCoeff))
-            return false;
-        memcpy(&aFilterCoeff, &data[pos], sizeof(aFilterCoeff)); 
-        pos += sizeof(aFilterCoeff);
-    }
-
-    if (isBitSet(maskByte1, 0))
-    {
-        if (dataSize < pos + 1)
-            return false;
-        enable = data[pos] == 0x00 ? false : true; pos += 1;
-    }
-
-    if (isBitSet(maskByte2, 7))
-    {
-        if (dataSize < pos + 1)
-            return false;
-        transparentBorder = data[pos] == 0x00 ? false : true; pos += 1;
-    }
-
-    if (isBitSet(maskByte2, 6))
-    {
-        if (dataSize < pos + sizeof(constXOffset))
-            return false;
-        memcpy(&constXOffset, &data[pos], sizeof(constXOffset)); 
-        pos += sizeof(constXOffset);
-    }
-
-    if (isBitSet(maskByte2, 5))
-    {
-        if (dataSize < pos + sizeof(constYOffset))
-            return false;
-        memcpy(&constYOffset, &data[pos], sizeof(constYOffset)); 
-        pos += sizeof(constYOffset);
-    }
-
-    if (isBitSet(maskByte2, 4))
-    {
-        if (dataSize < pos + sizeof(constAOffset))
-            return false;
-        memcpy(&constAOffset, &data[pos], sizeof(constAOffset)); 
-        pos += sizeof(constAOffset);
-    }
-
-    if (isBitSet(maskByte2, 3))
-    {
-        if (dataSize < pos + sizeof(instantXOffset))
-            return false;
-        memcpy(&instantXOffset, &data[pos], sizeof(instantXOffset)); 
-        pos += sizeof(instantXOffset);
-    }
-
-    if (isBitSet(maskByte2, 2))
-    {
-        if (dataSize < pos + sizeof(instantYOffset))
-            return false;
-        memcpy(&instantYOffset, &data[pos], sizeof(instantYOffset)); 
-        pos += sizeof(instantYOffset);
-    }
-
-    if (isBitSet(maskByte2, 1))
-    {
-        if (dataSize < pos + sizeof(instantAOffset))
-            return false;
-        memcpy(&instantAOffset, &data[pos], sizeof(instantAOffset)); 
-        pos += sizeof(instantAOffset);
-    }
-
-    if (isBitSet(maskByte2, 0))
-    {
-        if (dataSize < pos + sizeof(type))
-            return false;
-        memcpy(&type, &data[pos], sizeof(type)); 
-        pos += sizeof(type);
-    }
-
-    if (isBitSet(maskByte3, 7))
-    {
-        if (dataSize < pos + sizeof(cutFrequencyHz))
-            return false;
-        memcpy(&cutFrequencyHz, &data[pos], sizeof(cutFrequencyHz)); 
-        pos += sizeof(cutFrequencyHz);
-    }
-
-    if (isBitSet(maskByte3, 6))
-    {
-        if (dataSize < pos + sizeof(fps))
-            return false;
-        memcpy(&fps, &data[pos], sizeof(fps)); 
-        pos += sizeof(fps);
-    }
-
-    if (isBitSet(maskByte3, 5))
-    {
-        if (dataSize < pos + sizeof(processingTimeMks))
-            return false;
-        memcpy(&processingTimeMks, &data[pos], sizeof(processingTimeMks)); 
-        pos += sizeof(processingTimeMks);
-    }
-
-    if (isBitSet(maskByte3, 4))
-    {
-        if (dataSize < pos + sizeof(logMod))
-            return false;
-        memcpy(&logMod, &data[pos], sizeof(logMod));
-        pos += sizeof(logMod);
-    }
-
-    if (isBitSet(maskByte3, 3))
-    {
-        if (dataSize < pos + sizeof(backend))
-            return false;
-        memcpy(&backend, &data[pos], sizeof(backend)); 
-        pos += sizeof(backend);
-    }
-
-    if (isBitSet(maskByte3, 2))
-    {
-        if (dataSize < pos + sizeof(custom1))
-            return false;
-        memcpy(&custom1, &data[pos], sizeof(custom1)); 
-        pos += sizeof(custom1);
-    }
-
-    if (isBitSet(maskByte3, 1))
-    {
-        if (dataSize < pos + sizeof(custom2))
-            return false;
-        memcpy(&custom2, &data[pos], sizeof(custom2)); 
-        pos += sizeof(custom2);
-    }
-
-    if (isBitSet(maskByte3, 0))
-    {
-        if (dataSize < pos + sizeof(custom3))
-            return false;
-        memcpy(&custom3, &data[pos], sizeof(custom3)); 
-        pos += sizeof(custom3);
-    }
+    *this = result;
 
     return true;
 }
@@ -518,37 +379,18 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
 void cr::vstab::VStabiliser::encodeSetParamCommand(
         uint8_t* data, int& size, cr::vstab::VStabiliserParam id, float value)
 {
-    // Fill header.
-    data[0] = 0x01;
-    data[1] = VSTABILISER_MAJOR_VERSION;
-    data[2] = VSTABILISER_MINOR_VERSION;
-    size = 3;
-
-    // Fill data.
-    int paramId = (int)id;
-    memcpy(&data[3], &paramId, sizeof(paramId));
-    size += sizeof(paramId);
-    memcpy(&data[7], &value, sizeof(value));
-    size += sizeof(value);
+    encodeCommandData(data, size, SET_PARAM_DATA_TYPE,
+                      static_cast<int>(id), value);
 }
 
 
 
 void cr::vstab::VStabiliser::encodeCommand(
-        uint8_t* data, int& size, cr::vstab::VStabiliserCommand id, float value)
+        uint8_t* data, int& size, cr::vstab::VStabiliserCommand id,
+        float value)
 {
-    // Fill header.
-    data[0] = 0x00;
-    data[1] = VSTABILISER_MAJOR_VERSION;
-    data[2] = VSTABILISER_MINOR_VERSION;
-    size = 3;
-
-    // Fill data.
-    int commandId = (int)id;
-    memcpy(&data[3], &commandId, sizeof(commandId));
-    size += sizeof(commandId);
-    memcpy(&data[7], &value, sizeof(value));
-    size += sizeof(value);
+    encodeCommandData(data, size, COMMAND_DATA_TYPE,
+                      static_cast<int>(id), value);
 }
 
 
@@ -557,33 +399,45 @@ int cr::vstab::VStabiliser::decodeCommand(
         uint8_t* data, int size, cr::vstab::VStabiliserParam& paramId,
         cr::vstab::VStabiliserCommand& commandId, float& value)
 {
-    // Check size.
-    if (size < 11)
+    // Check the pointer and the size. Commands of both types have the same
+    // fixed size, so any other size is an error.
+    if (data == nullptr || size != COMMAND_SIZE)
+    {
         return -1;
+    }
 
     // Check version.
-    if (data[1] != VSTABILISER_MAJOR_VERSION ||
-        data[2] != VSTABILISER_MINOR_VERSION)
+    if (!isVersionSupported(data))
+    {
         return -1;
+    }
 
     // Extract data.
-    int id = 0;
-    memcpy(&id, &data[3], sizeof(id));
-    memcpy(&value, &data[7], sizeof(value));
+    int rawId = 0;
+    float argument = 0.0f;
+    std::memcpy(&rawId, &data[COMMAND_ID_POS], sizeof(rawId));
+    std::memcpy(&argument, &data[COMMAND_VALUE_POS], sizeof(argument));
 
-    // Check command type.
-    if (data[0] == 0x00)
+    // Check command type and the range of the ID. The output arguments are
+    // changed only if the command is valid.
+    if (data[DATA_TYPE_POS] == COMMAND_DATA_TYPE)
     {
-        commandId = (VStabiliserCommand)id;
+        if (rawId < COMMAND_ID_MIN || rawId > COMMAND_ID_MAX)
+        {
+            return -1;
+        }
+        commandId = static_cast<VStabiliserCommand>(rawId);
+        value = argument;
         return 0;
     }
-    else if (data[0] == 0x01)
+    if (data[DATA_TYPE_POS] == SET_PARAM_DATA_TYPE)
     {
-        // Check size.
-        if (size != 11)
-            return false;
-
-        paramId = (VStabiliserParam)id;
+        if (rawId < PARAM_ID_MIN || rawId > PARAM_ID_MAX)
+        {
+            return -1;
+        }
+        paramId = static_cast<VStabiliserParam>(rawId);
+        value = argument;
         return 1;
     }
 

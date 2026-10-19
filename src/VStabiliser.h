@@ -14,39 +14,45 @@ namespace vstab
 {
 /**
  * @brief Video stabilizer params mask. Used to serialize VStabiliserParams.
+ *
+ * Each flag enables serialization of the VStabiliserParams field with the same
+ * name (see VStabiliserParams::encode(...)).
  */
 struct VStabiliserParamsMask
 {
-    bool scaleFactor{true};
-    bool xOffsetLimit{true};
-    bool yOffsetLimit{true};
-    bool aOffsetLimit{true};
-    bool xFilterCoeff{true};
-    bool yFilterCoeff{true};
-    bool aFilterCoeff{true};
-    bool enable{true};
-    bool transparentBorder{true};
-    bool constXOffset{true};
-    bool constYOffset{true};
-    bool constAOffset{true};
-    bool instantXOffset{false};
-    bool instantYOffset{false};
-    bool instantAOffset{false};
-    bool type{true};
-    bool cutFrequencyHz{true};
-    bool fps{true};
-    bool processingTimeMks{true};
-    bool logMod{true};
-    bool backend{true};
-    bool custom1{true};
-    bool custom2{true};
-    bool custom3{true};
+    bool scaleFactor{true};         ///< Serialize scaleFactor field.
+    bool xOffsetLimit{true};        ///< Serialize xOffsetLimit field.
+    bool yOffsetLimit{true};        ///< Serialize yOffsetLimit field.
+    bool aOffsetLimit{true};        ///< Serialize aOffsetLimit field.
+    bool xFilterCoeff{true};        ///< Serialize xFilterCoeff field.
+    bool yFilterCoeff{true};        ///< Serialize yFilterCoeff field.
+    bool aFilterCoeff{true};        ///< Serialize aFilterCoeff field.
+    bool enable{true};              ///< Serialize enable field.
+    bool transparentBorder{true};   ///< Serialize transparentBorder field.
+    bool constXOffset{true};        ///< Serialize constXOffset field.
+    bool constYOffset{true};        ///< Serialize constYOffset field.
+    bool constAOffset{true};        ///< Serialize constAOffset field.
+    bool instantXOffset{false};     ///< Serialize instantXOffset field.
+    bool instantYOffset{false};     ///< Serialize instantYOffset field.
+    bool instantAOffset{false};     ///< Serialize instantAOffset field.
+    bool type{true};                ///< Serialize type field.
+    bool cutFrequencyHz{true};      ///< Serialize cutFrequencyHz field.
+    bool fps{true};                 ///< Serialize fps field.
+    bool processingTimeMks{true};   ///< Serialize processingTimeMks field.
+    bool logMod{true};              ///< Serialize logMod field.
+    bool backend{true};             ///< Serialize backend field.
+    bool custom1{true};             ///< Serialize custom1 field.
+    bool custom2{true};             ///< Serialize custom2 field.
+    bool custom3{true};             ///< Serialize custom3 field.
 };
 
 
 
 /**
  * @brief Video stabilizer params class.
+ *
+ * @note The class is not thread-safe: an object must not be accessed from
+ * several threads at the same time without external synchronization.
  */
 class VStabiliserParams
 {
@@ -116,7 +122,7 @@ public:
     /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     int type{2};
-    /// Cat frequency, Hz. Stabiliser will block vibrations with frequency
+    /// Cut frequency, Hz. Stabiliser will block vibrations with frequency
     /// > cutFrequencyHz.
     float cutFrequencyHz{2.0f};
     /// Frames per second of input video.
@@ -135,6 +141,8 @@ public:
     /// Custom param 3. Value depends on implementation.
     float custom3{0};
 
+    // The fields instantXOffset, instantYOffset, instantAOffset and
+    // processingTimeMks are not written to JSON and not read from JSON.
     JSON_READABLE(VStabiliserParams,
                   scaleFactor,
                   xOffsetLimit,
@@ -158,21 +166,40 @@ public:
                   custom3)
 
     /**
-     * @brief Encode params.
-     * @param data Pointer to data buffer.
-     * @param bufferSize Data buffer size.
-     * @param size Size of data.
-     * @param mask Pointer to params mask to include in data.
-     * @return TRUE if params encoded (serialized) or FALSE if not.
+     * @brief Encode (serialize) params.
+     *
+     * The encoded data contains the data type, the major and minor version of
+     * the library, a 3 bytes mask of the encoded fields and the values of the
+     * fields selected by the mask. The decode(...) method accepts only data
+     * encoded by the library of the same major and minor version.
+     *
+     * @param data Pointer to data buffer. Must not be nullptr. The buffer must
+     * be valid for bufferSize bytes.
+     * @param bufferSize Data buffer size, bytes. Must be >= 96 (the size of
+     * the data with all fields) even if the mask excludes some fields.
+     * @param size Size of encoded data, bytes. Set to 0 if params not encoded.
+     * @param mask Pointer to params mask to include in data. If nullptr all
+     * fields are included in the data.
+     * @return TRUE if params encoded (serialized) or FALSE if not (data is
+     * nullptr or bufferSize is less than 96). If FALSE is returned nothing is
+     * written to the buffer.
      */
     bool encode(uint8_t* data, int bufferSize,
                 int& size, VStabiliserParamsMask* mask = nullptr);
 
     /**
-     * @brief Decode params.
-     * @param data Pointer to data.
-     * @param dataSize Size of data.
-     * @return TRUE is params decoded or FALSE if not.
+     * @brief Decode (deserialize) params encoded by encode(...) method.
+     *
+     * The method checks the data type, the version and the size of the data
+     * before reading each field. Fields that are not included in the data are
+     * set to zero (false). Values of the fields are not checked against any
+     * range: the video stabiliser implementation must validate them. Bytes
+     * after the last field are ignored.
+     *
+     * @param data Pointer to encoded data. Must not be nullptr.
+     * @param dataSize Size of encoded data, bytes.
+     * @return TRUE is params decoded or FALSE if not. If FALSE is returned the
+     * object is not changed.
      */
     bool decode(uint8_t* data, int dataSize);
 };
@@ -181,6 +208,10 @@ public:
 
 /**
  * @brief The video stabiliser params enum.
+ *
+ * @note CUSTOM_3 is the last value: VStabiliser::decodeCommand(...) uses it to
+ * check the range of the param ID. A new value must be added to the end of the
+ * enum and the check must be updated.
  */
 enum class VStabiliserParam
 {
@@ -254,7 +285,7 @@ enum class VStabiliserParam
     /// 2 - 3D. Stabilisation on horizontal and vertical + rotation.
     /// Particular implementation can have unique values.
     TYPE,
-    /// Cat frequency, Hz. Stabiliser will block vibrations with frequency
+    /// Cut frequency, Hz. Stabiliser will block vibrations with frequency
     /// > CUT_FREQUENCY_HZ.
     CUT_FREQUENCY_HZ,
     /// Frames per second of input video.
@@ -270,7 +301,8 @@ enum class VStabiliserParam
     CUSTOM_1,
     /// Custom param 2. Value depends on implementation.
     CUSTOM_2,
-    /// Custom param 3. Value depends on implementation.
+    /// Custom param 3. Value depends on implementation. The last value of the
+    /// enum.
     CUSTOM_3
 };
 
@@ -278,16 +310,23 @@ enum class VStabiliserParam
 
 /**
  * @brief The video stabiliser commands enum.
+ *
+ * @note HOLD_MSEC is the last value: VStabiliser::decodeCommand(...) uses it
+ * to check the range of the command ID. A new value must be added to the end
+ * of the enum and the check must be updated.
  */
 enum class VStabiliserCommand
 {
     /// Reset stabilisation algorithm. No params.
     RESET = 1,
-    /// Enable stabilisation. After execution parameter MODE must be set to 1. No params.
+    /// Enable stabilisation. After execution parameter MODE must be set to 1.
+    /// No params.
     ON,
-    /// Disable stabilisation. After execution parameter MODE must be set to 0. No params.
+    /// Disable stabilisation. After execution parameter MODE must be set to 0.
+    /// No params.
     OFF,
-    /// Hold processing for some time. Parameter - time in milliseconds.
+    /// Hold processing for some time. Parameter - time in milliseconds. The
+    /// last value of the enum.
     HOLD_MSEC
 };
 
@@ -320,14 +359,17 @@ public:
 
     /**
      * @brief Set param.
+     * @note The implementation must be thread-safe.
      * @param id Param ID.
-     * @param value Param value.
+     * @param value Param value. The value is not checked by the interface:
+     * the implementation must validate it.
      * @return TRUE if param was accepted or FALSE if not.
      */
     virtual bool setParam(VStabiliserParam id, float value) = 0;
 
     /**
      * @brief Get param.
+     * @note The implementation must be thread-safe.
      * @param id Param ID.
      * @return Param value or -1 if this param not supported by implementation.
      */
@@ -335,14 +377,17 @@ public:
 
     /**
      * @brief Get params.
+     * @note The implementation must be thread-safe.
      * @param params Params class object.
      */
     virtual void getParams(VStabiliserParams& params) = 0;
 
     /**
      * @brief Execute command.
+     * @note The implementation must be thread-safe.
      * @param id Command ID.
-     * @param value Command argument.
+     * @param value Command argument. The value is not checked by the
+     * interface: the implementation must validate it.
      * @return TRUE if the command executed or FALSE if not.
      */
     virtual bool executeCommand(VStabiliserCommand id, float value = 0.0f) = 0;
@@ -358,6 +403,7 @@ public:
     /**
      * @brief Get offsets: horizontal, vertical and rotation. The method must
      * return current offsets which implemented to last processed video frame.
+     * @note The implementation must be thread-safe.
      * @param dX Horizontal offset.
      * @param dY Vertical offset.
      * @param dA Rotational angle, radians.
@@ -366,8 +412,13 @@ public:
 
     /**
      * @brief Encode set param command.
-     * @param data Pointer to data buffer. Must have size >= 11.
-     * @param size Size of encoded data.
+     *
+     * The method is thread-safe. It writes exactly 11 bytes.
+     *
+     * @param data Pointer to data buffer. Must not be nullptr. The buffer must
+     * be valid for 11 bytes.
+     * @param size Size of encoded data, bytes. Set to 11, or to 0 if data is
+     * nullptr (nothing is written in this case).
      * @param id Parameter id.
      * @param value Parameter value.
      */
@@ -376,21 +427,33 @@ public:
 
     /**
      * @brief Encode command.
-     * @param data Pointer to data buffer. Must have size >= 11.
-     * @param size Size of encoded data.
-     * @param value Parameter value.
+     *
+     * The method is thread-safe. It writes exactly 11 bytes.
+     *
+     * @param data Pointer to data buffer. Must not be nullptr. The buffer must
+     * be valid for 11 bytes.
+     * @param size Size of encoded data, bytes. Set to 11, or to 0 if data is
+     * nullptr (nothing is written in this case).
      * @param id Command ID.
+     * @param value Command argument.
      */
     static void encodeCommand(
-            uint8_t* data, int& size, VStabiliserCommand id, float value = 0.0f);
+            uint8_t* data, int& size, VStabiliserCommand id,
+            float value = 0.0f);
 
     /**
      * @brief Decode command.
-     * @param data Pointer to command data.
-     * @param size Size of data.
-     * @param paramId Output command ID.
-     * @param commandId Output command ID.
-     * @param value Param or command value.
+     *
+     * The method is thread-safe. It checks the pointer, the size (both types
+     * of the command have the size of 11 bytes), the data type, the version
+     * and the range of the ID. The output arguments are changed only if the
+     * command is decoded. The argument value is not checked by the method.
+     *
+     * @param data Pointer to command data. Must not be nullptr.
+     * @param size Size of data, bytes. Must be 11.
+     * @param paramId Output param ID (set param command).
+     * @param commandId Output command ID (action command).
+     * @param value Output param value or command argument.
      * @return 0 - command decoded, 1 - set param command decoded, -1 - error.
      */
     static int decodeCommand(uint8_t* data,
@@ -401,11 +464,45 @@ public:
 
     /**
      * @brief Decode and execute command.
+     * @note The implementation must be thread-safe.
      * @param data Pointer to command data.
-     * @param size Size of data.
+     * @param size Size of data, bytes.
      * @return TRUE if command decoded and executed or FALSE if not.
      */
     virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
+
+protected:
+
+    /**
+     * @brief Default constructor. The class can be used as a base only.
+     */
+    VStabiliser() = default;
+
+    /**
+     * @brief Copy constructor.
+     * @param src Source object.
+     */
+    VStabiliser(const VStabiliser& src) = default;
+
+    /**
+     * @brief Move constructor.
+     * @param src Source object.
+     */
+    VStabiliser(VStabiliser&& src) = default;
+
+    /**
+     * @brief Copy assignment operator.
+     * @param src Source object.
+     * @return Reference to this object.
+     */
+    VStabiliser& operator=(const VStabiliser& src) = default;
+
+    /**
+     * @brief Move assignment operator.
+     * @param src Source object.
+     * @return Reference to this object.
+     */
+    VStabiliser& operator=(VStabiliser&& src) = default;
 };
 }
 }
