@@ -26,14 +26,14 @@ constexpr int FIRST_PARAM_ID{1};
 /// The last param ID.
 constexpr int LAST_PARAM_ID{24};
 static_assert(LAST_PARAM_ID ==
-              static_cast<int>(cr::vstab::VStabiliserParam::CUSTOM_3),
+              static_cast<int>(rapidpixel::VStabiliserParam::CUSTOM_3),
               "the test must cover all param IDs");
 /// The first command ID.
 constexpr int FIRST_COMMAND_ID{1};
 /// The last command ID.
 constexpr int LAST_COMMAND_ID{4};
 static_assert(LAST_COMMAND_ID ==
-              static_cast<int>(cr::vstab::VStabiliserCommand::HOLD_MSEC),
+              static_cast<int>(rapidpixel::VStabiliserCommand::HOLD_MSEC),
               "the test must cover all command IDs");
 /// Byte which fills buffers to detect writes outside of the expected area.
 constexpr uint8_t SENTINEL{0xA5};
@@ -135,7 +135,7 @@ void checkField(const char* name, T in, T out, bool selected, int& errors)
 
 /// Get the flags of the params mask in the order of the fields.
 std::array<bool, FIELDS_NUMBER> maskFlags(
-        const cr::vstab::VStabiliserParamsMask& m)
+        const rapidpixel::VStabiliserParamsMask& m)
 {
     return {{m.scaleFactor, m.xOffsetLimit, m.yOffsetLimit, m.aOffsetLimit,
              m.xFilterCoeff, m.yFilterCoeff, m.aFilterCoeff, m.enable,
@@ -149,10 +149,10 @@ std::array<bool, FIELDS_NUMBER> maskFlags(
 
 
 /// Set the mask from the flags in the order of the fields.
-cr::vstab::VStabiliserParamsMask makeMask(
+rapidpixel::VStabiliserParamsMask makeMask(
         const std::array<bool, FIELDS_NUMBER>& f)
 {
-    cr::vstab::VStabiliserParamsMask m;
+    rapidpixel::VStabiliserParamsMask m;
     m.scaleFactor = f[0];
     m.xOffsetLimit = f[1];
     m.yOffsetLimit = f[2];
@@ -183,7 +183,7 @@ cr::vstab::VStabiliserParamsMask makeMask(
 
 
 /// Get the mask with all flags set.
-cr::vstab::VStabiliserParamsMask makeFullMask()
+rapidpixel::VStabiliserParamsMask makeFullMask()
 {
     std::array<bool, FIELDS_NUMBER> flags{};
     flags.fill(true);
@@ -193,7 +193,7 @@ cr::vstab::VStabiliserParamsMask makeFullMask()
 
 
 /// Get random mask.
-cr::vstab::VStabiliserParamsMask makeRandomMask()
+rapidpixel::VStabiliserParamsMask makeRandomMask()
 {
     std::array<bool, FIELDS_NUMBER> flags{};
     for (bool& flag : flags)
@@ -207,7 +207,7 @@ cr::vstab::VStabiliserParamsMask makeRandomMask()
 
 /// Get the size of the encoded params for the mask, bytes. The fields enable
 /// and transparentBorder (the 8th and 9th) are 1 byte, all others are 4 bytes.
-int expectedSize(const cr::vstab::VStabiliserParamsMask& mask)
+int expectedSize(const rapidpixel::VStabiliserParamsMask& mask)
 {
     const auto flags = maskFlags(mask);
     int size = HEADER_SIZE;
@@ -224,7 +224,7 @@ int expectedSize(const cr::vstab::VStabiliserParamsMask& mask)
 
 
 /// Fill all fields with random bit patterns (NaN and infinity included).
-void fillRandom(cr::vstab::VStabiliserParams& p)
+void fillRandom(rapidpixel::VStabiliserParams& p)
 {
     p.scaleFactor = static_cast<int>(randomBits());
     p.xOffsetLimit = static_cast<int>(randomBits());
@@ -256,7 +256,7 @@ void fillRandom(cr::vstab::VStabiliserParams& p)
 
 /// Fill the fields with random finite values which survive a conversion to
 /// text and back.
-void fillRandomFinite(cr::vstab::VStabiliserParams& p)
+void fillRandomFinite(rapidpixel::VStabiliserParams& p)
 {
     fillRandom(p);
     p.aOffsetLimit = randomFiniteFloat();
@@ -277,9 +277,9 @@ void fillRandomFinite(cr::vstab::VStabiliserParams& p)
 /// Check all fields of the output params object. A field must be equal to the
 /// field of the input if the mask flag is set, otherwise it must be zero.
 /// Returns the number of wrong fields.
-int compareParams(const cr::vstab::VStabiliserParams& in,
-                  const cr::vstab::VStabiliserParams& out,
-                  const cr::vstab::VStabiliserParamsMask& mask)
+int compareParams(const rapidpixel::VStabiliserParams& in,
+                  const rapidpixel::VStabiliserParams& out,
+                  const rapidpixel::VStabiliserParamsMask& mask)
 {
     int errors = 0;
     checkField("scaleFactor", in.scaleFactor, out.scaleFactor,
@@ -328,8 +328,8 @@ int compareParams(const cr::vstab::VStabiliserParams& in,
 
 
 /// Compare two params objects field by field (all fields).
-bool sameParams(const cr::vstab::VStabiliserParams& a,
-                const cr::vstab::VStabiliserParams& b)
+bool sameParams(const rapidpixel::VStabiliserParams& a,
+                const rapidpixel::VStabiliserParams& b)
 {
     return compareParams(a, b, makeFullMask()) == 0;
 }
@@ -413,18 +413,18 @@ private:
 bool copyTest()
 {
     g_randomState = 1U;
-    cr::vstab::VStabiliserParams in;
+    rapidpixel::VStabiliserParams in;
     fillRandom(in);
 
     // Copy constructor.
-    const cr::vstab::VStabiliserParams copy = in;
+    const rapidpixel::VStabiliserParams copy = in;
     if (compareParams(in, copy, makeFullMask()) != 0)
     {
         return fail("Copy constructor");
     }
 
     // Copy assignment.
-    cr::vstab::VStabiliserParams assigned;
+    rapidpixel::VStabiliserParams assigned;
     assigned = in;
     if (compareParams(in, assigned, makeFullMask()) != 0)
     {
@@ -442,7 +442,7 @@ bool copyTest()
 bool layoutTest()
 {
     // Params with a distinct value in each field.
-    cr::vstab::VStabiliserParams p;
+    rapidpixel::VStabiliserParams p;
     p.scaleFactor = 0x01020304;
     p.xOffsetLimit = 0x11121314;
     p.yOffsetLimit = 0x21222324;
@@ -535,7 +535,7 @@ bool layoutTest()
 
     // The default mask excludes instant offsets: mask bytes are 0xFF, 0xF1,
     // 0xFF and the data is 12 bytes shorter.
-    cr::vstab::VStabiliserParamsMask defaultMask;
+    rapidpixel::VStabiliserParamsMask defaultMask;
     std::array<uint8_t, FULL_SIZE> masked{};
     if (!p.encode(masked.data(), FULL_SIZE, size, &defaultMask) ||
         size != FULL_SIZE - 12)
@@ -558,7 +558,7 @@ bool encodeDecodeTest()
     g_randomState = 2U;
     for (int i = 0; i < 2000; ++i)
     {
-        cr::vstab::VStabiliserParams in;
+        rapidpixel::VStabiliserParams in;
         fillRandom(in);
 
         // Encode data without mask and with the mask with all flags set: the
@@ -581,7 +581,7 @@ bool encodeDecodeTest()
         }
 
         // Decode data.
-        cr::vstab::VStabiliserParams out;
+        rapidpixel::VStabiliserParams out;
         if (!out.decode(data.data(), size))
         {
             return fail("Can't decode data");
@@ -605,7 +605,7 @@ bool encodeDecodeWithMaskTest()
     // Random masks.
     for (int i = 0; i < 5000; ++i)
     {
-        cr::vstab::VStabiliserParams in;
+        rapidpixel::VStabiliserParams in;
         fillRandom(in);
         auto mask = makeRandomMask();
 
@@ -624,7 +624,7 @@ bool encodeDecodeWithMaskTest()
 
         // Fields which are not in the mask must be zero in the result: the
         // output object is prepared with random values to check this.
-        cr::vstab::VStabiliserParams out;
+        rapidpixel::VStabiliserParams out;
         fillRandom(out);
         if (!out.decode(data.data(), size))
         {
@@ -637,7 +637,7 @@ bool encodeDecodeWithMaskTest()
     }
 
     // Every single field.
-    cr::vstab::VStabiliserParams in;
+    rapidpixel::VStabiliserParams in;
     fillRandom(in);
     for (size_t field = 0; field < FIELDS_NUMBER; ++field)
     {
@@ -646,7 +646,7 @@ bool encodeDecodeWithMaskTest()
         auto mask = makeMask(flags);
         std::array<uint8_t, FULL_SIZE> data{};
         int size = 0;
-        cr::vstab::VStabiliserParams out;
+        rapidpixel::VStabiliserParams out;
         if (!in.encode(data.data(), FULL_SIZE, size, &mask) ||
             size != expectedSize(mask) || !out.decode(data.data(), size) ||
             compareParams(in, out, mask) != 0)
@@ -661,7 +661,7 @@ bool encodeDecodeWithMaskTest()
     auto emptyMask = makeMask(std::array<bool, FIELDS_NUMBER>{});
     std::array<uint8_t, FULL_SIZE> data{};
     int size = 0;
-    cr::vstab::VStabiliserParams out;
+    rapidpixel::VStabiliserParams out;
     fillRandom(out);
     if (!in.encode(data.data(), FULL_SIZE, size, &emptyMask) ||
         size != HEADER_SIZE || !out.decode(data.data(), size) ||
@@ -680,7 +680,7 @@ bool encodeDecodeWithMaskTest()
 bool bufferBoundariesTest()
 {
     g_randomState = 4U;
-    cr::vstab::VStabiliserParams in;
+    rapidpixel::VStabiliserParams in;
     fillRandom(in);
 
     // Null pointer: rejected, the size is zero.
@@ -746,10 +746,10 @@ bool bufferBoundariesTest()
 
 /// Decode the data into a copy of the reference object and check that the data
 /// is rejected and that the object is not changed.
-bool isRejected(const cr::vstab::VStabiliserParams& reference,
+bool isRejected(const rapidpixel::VStabiliserParams& reference,
                 uint8_t* data, int dataSize)
 {
-    cr::vstab::VStabiliserParams object = reference;
+    rapidpixel::VStabiliserParams object = reference;
     const bool decoded = object.decode(data, dataSize);
     return !decoded && sameParams(object, reference);
 }
@@ -758,16 +758,16 @@ bool isRejected(const cr::vstab::VStabiliserParams& reference,
 
 /// Check that every truncation of the data (for masks of a few kinds) is
 /// rejected.
-bool checkTruncations(const cr::vstab::VStabiliserParams& source)
+bool checkTruncations(const rapidpixel::VStabiliserParams& source)
 {
-    cr::vstab::VStabiliserParams reference;
+    rapidpixel::VStabiliserParams reference;
     fillRandom(reference);
     for (int mode = 0; mode < 64; ++mode)
     {
         auto mask = mode == 0 ? makeFullMask() : makeRandomMask();
         std::array<uint8_t, FULL_SIZE> masked{};
         int maskedSize = 0;
-        cr::vstab::VStabiliserParams encoder = source;
+        rapidpixel::VStabiliserParams encoder = source;
         if (!encoder.encode(masked.data(), FULL_SIZE, maskedSize, &mask))
         {
             return fail("Can't encode data with mask");
@@ -790,7 +790,7 @@ bool checkTruncations(const cr::vstab::VStabiliserParams& source)
 
 /// Check that every wrong value of the data type byte, of the major version
 /// byte and of the minor version byte is rejected.
-bool checkHeaderBytes(const cr::vstab::VStabiliserParams& reference,
+bool checkHeaderBytes(const rapidpixel::VStabiliserParams& reference,
                       const std::array<uint8_t, FULL_SIZE>& data)
 {
     for (size_t position = 0; position < 3; ++position)
@@ -824,8 +824,8 @@ bool checkTrailingBytes(const std::array<uint8_t, FULL_SIZE>& data)
     longer.fill(0xFF);
     std::memcpy(longer.data(), data.data(), data.size());
     std::array<uint8_t, FULL_SIZE> exactData = data;
-    cr::vstab::VStabiliserParams exact;
-    cr::vstab::VStabiliserParams withTail;
+    rapidpixel::VStabiliserParams exact;
+    rapidpixel::VStabiliserParams withTail;
     return exact.decode(exactData.data(), FULL_SIZE) &&
            withTail.decode(longer.data(), static_cast<int>(longer.size())) &&
            sameParams(exact, withTail);
@@ -834,14 +834,14 @@ bool checkTrailingBytes(const std::array<uint8_t, FULL_SIZE>& data)
 
 
 /// Check that a bool field is true for any byte except 0x00.
-bool checkBoolBytes(const cr::vstab::VStabiliserParams& source)
+bool checkBoolBytes(const rapidpixel::VStabiliserParams& source)
 {
     auto onlyFlags = makeMask(std::array<bool, FIELDS_NUMBER>{});
     onlyFlags.enable = true;
     onlyFlags.transparentBorder = true;
     std::array<uint8_t, FULL_SIZE> flagsData{};
     int flagsSize = 0;
-    cr::vstab::VStabiliserParams encoder = source;
+    rapidpixel::VStabiliserParams encoder = source;
     if (!encoder.encode(flagsData.data(), FULL_SIZE, flagsSize, &onlyFlags) ||
         flagsSize != HEADER_SIZE + 2)
     {
@@ -854,7 +854,7 @@ bool checkBoolBytes(const cr::vstab::VStabiliserParams& source)
         {
             flagsData[HEADER_SIZE] = first;
             flagsData[HEADER_SIZE + 1] = second;
-            cr::vstab::VStabiliserParams decoded;
+            rapidpixel::VStabiliserParams decoded;
             if (!decoded.decode(flagsData.data(), flagsSize) ||
                 decoded.enable != (first != 0x00) ||
                 decoded.transparentBorder != (second != 0x00))
@@ -874,7 +874,7 @@ bool checkBoolBytes(const cr::vstab::VStabiliserParams& source)
 bool invalidParamsDataTest()
 {
     g_randomState = 5U;
-    cr::vstab::VStabiliserParams source;
+    rapidpixel::VStabiliserParams source;
     fillRandom(source);
     std::array<uint8_t, FULL_SIZE> data{};
     int size = 0;
@@ -884,7 +884,7 @@ bool invalidParamsDataTest()
     }
 
     // The object that must stay unchanged after every rejected decode.
-    cr::vstab::VStabiliserParams reference;
+    rapidpixel::VStabiliserParams reference;
     fillRandom(reference);
 
     // Null pointer and wrong sizes.
@@ -919,7 +919,7 @@ bool damagedDataTest()
     int rejected = 0;
     for (int i = 0; i < 60000; ++i)
     {
-        cr::vstab::VStabiliserParams source;
+        rapidpixel::VStabiliserParams source;
         fillRandom(source);
         auto mask = makeRandomMask();
         std::array<uint8_t, FULL_SIZE + 16> data{};
@@ -945,11 +945,11 @@ bool damagedDataTest()
         const int newSize = randomInt(size + 16);
 
         // Decode twice into different objects: the results must be equal.
-        cr::vstab::VStabiliserParams first;
-        cr::vstab::VStabiliserParams second;
+        rapidpixel::VStabiliserParams first;
+        rapidpixel::VStabiliserParams second;
         fillRandom(first);
         second = first;
-        const cr::vstab::VStabiliserParams before = first;
+        const rapidpixel::VStabiliserParams before = first;
         const bool firstResult = first.decode(data.data(), newSize);
         const bool secondResult = second.decode(data.data(), newSize);
         if (firstResult != secondResult || !sameParams(first, second))
@@ -970,7 +970,7 @@ bool damagedDataTest()
         ++accepted;
         std::array<uint8_t, FULL_SIZE> encoded{};
         int encodedSize = 0;
-        cr::vstab::VStabiliserParams again;
+        rapidpixel::VStabiliserParams again;
         if (!first.encode(encoded.data(), FULL_SIZE, encodedSize) ||
             !again.decode(encoded.data(), encodedSize) ||
             !sameParams(first, again))
@@ -998,15 +998,15 @@ bool checkCommandRoundTrip(bool setParam, int id)
     int size = 0;
     if (setParam)
     {
-        cr::vstab::VStabiliser::encodeSetParamCommand(
+        rapidpixel::VStabiliser::encodeSetParamCommand(
                     data.data(), size,
-                    static_cast<cr::vstab::VStabiliserParam>(id), outValue);
+                    static_cast<rapidpixel::VStabiliserParam>(id), outValue);
     }
     else
     {
-        cr::vstab::VStabiliser::encodeCommand(
+        rapidpixel::VStabiliser::encodeCommand(
                     data.data(), size,
-                    static_cast<cr::vstab::VStabiliserCommand>(id), outValue);
+                    static_cast<rapidpixel::VStabiliserCommand>(id), outValue);
     }
     if (size != COMMAND_SIZE)
     {
@@ -1031,10 +1031,10 @@ bool checkCommandRoundTrip(bool setParam, int id)
     }
 
     // Decode: only the ID of the command type is set.
-    auto paramId = cr::vstab::VStabiliserParam::CUSTOM_3;
-    auto commandId = cr::vstab::VStabiliserCommand::OFF;
+    auto paramId = rapidpixel::VStabiliserParam::CUSTOM_3;
+    auto commandId = rapidpixel::VStabiliserCommand::OFF;
     float value{0.0f};
-    const int result = cr::vstab::VStabiliser::decodeCommand(
+    const int result = rapidpixel::VStabiliser::decodeCommand(
                 data.data(), size, paramId, commandId, value);
     if (result != (setParam ? 1 : 0))
     {
@@ -1042,9 +1042,9 @@ bool checkCommandRoundTrip(bool setParam, int id)
     }
     const bool sameId = setParam
             ? static_cast<int>(paramId) == id &&
-              commandId == cr::vstab::VStabiliserCommand::OFF
+              commandId == rapidpixel::VStabiliserCommand::OFF
             : static_cast<int>(commandId) == id &&
-              paramId == cr::vstab::VStabiliserParam::CUSTOM_3;
+              paramId == rapidpixel::VStabiliserParam::CUSTOM_3;
     if (!sameId || bitsOf(value) != bitsOf(outValue))
     {
         return fail("Wrong decoded command");
@@ -1084,15 +1084,15 @@ bool commandsTest()
 
     // Null pointer: nothing is written, the size is zero.
     int size = 1234;
-    cr::vstab::VStabiliser::encodeCommand(
-                nullptr, size, cr::vstab::VStabiliserCommand::ON);
+    rapidpixel::VStabiliser::encodeCommand(
+                nullptr, size, rapidpixel::VStabiliserCommand::ON);
     if (size != 0)
     {
         return fail("nullptr must give zero size (command)");
     }
     size = 1234;
-    cr::vstab::VStabiliser::encodeSetParamCommand(
-                nullptr, size, cr::vstab::VStabiliserParam::FPS, 1.0f);
+    rapidpixel::VStabiliser::encodeSetParamCommand(
+                nullptr, size, rapidpixel::VStabiliserParam::FPS, 1.0f);
     if (size != 0)
     {
         return fail("nullptr must give zero size (set param)");
@@ -1104,10 +1104,10 @@ bool commandsTest()
 
 
 /// The output arguments which must not change if a command is rejected.
-constexpr cr::vstab::VStabiliserParam REFERENCE_PARAM{
-    cr::vstab::VStabiliserParam::CUSTOM_2};
-constexpr cr::vstab::VStabiliserCommand REFERENCE_COMMAND{
-    cr::vstab::VStabiliserCommand::OFF};
+constexpr rapidpixel::VStabiliserParam REFERENCE_PARAM{
+    rapidpixel::VStabiliserParam::CUSTOM_2};
+constexpr rapidpixel::VStabiliserCommand REFERENCE_COMMAND{
+    rapidpixel::VStabiliserCommand::OFF};
 constexpr float REFERENCE_VALUE{12345.0f};
 
 
@@ -1119,7 +1119,7 @@ bool isCommandRejected(uint8_t* data, int size)
     auto paramId = REFERENCE_PARAM;
     auto commandId = REFERENCE_COMMAND;
     float value{REFERENCE_VALUE};
-    const int result = cr::vstab::VStabiliser::decodeCommand(
+    const int result = rapidpixel::VStabiliser::decodeCommand(
                 data, size, paramId, commandId, value);
     return result == -1 && paramId == REFERENCE_PARAM &&
            commandId == REFERENCE_COMMAND &&
@@ -1135,14 +1135,14 @@ void encodeValidCommand(bool setParam, std::array<uint8_t, 32>& data)
     int size = 0;
     if (setParam)
     {
-        cr::vstab::VStabiliser::encodeSetParamCommand(
-                    data.data(), size, cr::vstab::VStabiliserParam::FPS, 25.0f);
+        rapidpixel::VStabiliser::encodeSetParamCommand(
+                    data.data(), size, rapidpixel::VStabiliserParam::FPS, 25.0f);
     }
     else
     {
-        cr::vstab::VStabiliser::encodeCommand(
+        rapidpixel::VStabiliser::encodeCommand(
                     data.data(), size,
-                    cr::vstab::VStabiliserCommand::HOLD_MSEC, 100.0f);
+                    rapidpixel::VStabiliserCommand::HOLD_MSEC, 100.0f);
     }
 }
 
@@ -1265,27 +1265,27 @@ bool invalidCommandsTest()
 bool jsonReadWriteTest()
 {
     g_randomState = 9U;
-    cr::vstab::VStabiliserParams in;
+    rapidpixel::VStabiliserParams in;
     fillRandomFinite(in);
 
     // The fields which are not written to JSON keep their default values (0)
     // in the object that is read.
-    cr::vstab::VStabiliserParamsMask jsonMask = makeFullMask();
+    rapidpixel::VStabiliserParamsMask jsonMask = makeFullMask();
     jsonMask.instantXOffset = false;
     jsonMask.instantYOffset = false;
     jsonMask.instantAOffset = false;
     jsonMask.processingTimeMks = false;
 
     // Write params to string and read them back.
-    cr::utils::ConfigReader stringWriter;
+    rapidpixel::ConfigReader stringWriter;
     std::string text;
     if (!stringWriter.set(in, "VStabiliserParams") ||
         !stringWriter.writeToString(text))
     {
         return fail("Can't write params to string");
     }
-    cr::utils::ConfigReader stringReader;
-    cr::vstab::VStabiliserParams fromString;
+    rapidpixel::ConfigReader stringReader;
+    rapidpixel::VStabiliserParams fromString;
     if (!stringReader.readFromString(text) ||
         !stringReader.get(fromString, "VStabiliserParams"))
     {
@@ -1298,18 +1298,18 @@ bool jsonReadWriteTest()
 
     // Write params to file and read them back. The file is removed.
     TempFile file("TestVStabiliserParams.json");
-    cr::utils::ConfigReader inConfig;
+    rapidpixel::ConfigReader inConfig;
     inConfig.set(in, "VStabiliserParams");
     if (!inConfig.writeToFile(file.name()))
     {
         return fail("Can't write params to file");
     }
-    cr::utils::ConfigReader outConfig;
+    rapidpixel::ConfigReader outConfig;
     if (!outConfig.readFromFile(file.name()))
     {
         return fail("Can't open config file");
     }
-    cr::vstab::VStabiliserParams out;
+    rapidpixel::VStabiliserParams out;
     if (!outConfig.get(out, "VStabiliserParams"))
     {
         return fail("Can't read params from file");
@@ -1336,10 +1336,10 @@ bool jsonReadWriteTest()
         "{\"VStabiliserParams\": {\"scaleFactor\": \"two\"}}"};
     for (const std::string& document : documents)
     {
-        cr::utils::ConfigReader reader;
-        cr::vstab::VStabiliserParams object;
+        rapidpixel::ConfigReader reader;
+        rapidpixel::VStabiliserParams object;
         fillRandom(object);
-        const cr::vstab::VStabiliserParams reference = object;
+        const rapidpixel::VStabiliserParams reference = object;
         if (reader.readFromString(document) &&
             reader.get(object, "VStabiliserParams"))
         {
@@ -1353,7 +1353,7 @@ bool jsonReadWriteTest()
     }
 
     // A file that does not exist.
-    cr::utils::ConfigReader missing;
+    rapidpixel::ConfigReader missing;
     if (missing.readFromFile("NoSuchVStabiliserParams.json"))
     {
         return fail("A missing file must be rejected");
@@ -1370,9 +1370,9 @@ bool versionTest()
     const std::string expected = std::to_string(VSTABILISER_MAJOR_VERSION) +
             "." + std::to_string(VSTABILISER_MINOR_VERSION) + "." +
             std::to_string(VSTABILISER_PATCH_VERSION);
-    std::cout << "Version: " << cr::vstab::VStabiliser::getVersion()
+    std::cout << "Version: " << rapidpixel::VStabiliser::getVersion()
               << std::endl;
-    return cr::vstab::VStabiliser::getVersion() == expected &&
+    return rapidpixel::VStabiliser::getVersion() == expected &&
            expected == VSTABILISER_VERSION;
 }
 }

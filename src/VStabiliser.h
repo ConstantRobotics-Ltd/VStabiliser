@@ -8,9 +8,7 @@
 
 
 
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 /**
  * @brief Video stabilizer params mask. Used to serialize VStabiliserParams.
@@ -398,7 +396,7 @@ public:
      * @param dst Result video frame.
      * @return TRUE if video frame processed or FALSE in case any errors.
      */
-    virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
+    virtual bool stabilise(rapidpixel::Frame& src, rapidpixel::Frame& dst) = 0;
 
     /**
      * @brief Get offsets: horizontal, vertical and rotation. The method must
@@ -504,5 +502,16 @@ protected:
      */
     VStabiliser& operator=(VStabiliser&& src) = default;
 };
+}
+
+
+
+// Compatibility: the names of namespace rapidpixel are also available in
+// namespace cr::vstab.
+namespace cr
+{
+namespace vstab
+{
+using namespace ::rapidpixel;
 }
 }

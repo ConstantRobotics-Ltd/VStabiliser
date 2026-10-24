@@ -110,9 +110,7 @@ src -------------------------------- Folder with source code of the library.
 **VStabiliser.h** file contains **VStabiliser** class declaration. Class declaration:
 
 ```cpp
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 /// Video stabiliser interface class.
 class VStabiliser
@@ -141,7 +139,7 @@ public:
     virtual bool executeCommand(VStabiliserCommand id, float value = 0.0f) = 0;
 
     /// Stabilise video frame.
-    virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
+    virtual bool stabilise(rapidpixel::Frame& src, rapidpixel::Frame& dst) = 0;
 
     /// Get offsets: horizontal, vertical and rotation.
     virtual void getOffsets(float& dX, float& dY, float& dA) = 0;
@@ -182,7 +180,6 @@ protected:
     VStabiliser& operator=(VStabiliser&& src) = default;
 };
 }
-}
 ```
 
 
@@ -198,7 +195,7 @@ static std::string getVersion();
 Method can be used without **VStabiliser** class instance. Example:
 
 ```cpp
-std::cout << "VStabiliser class version: " << cr::vstab::VStabiliser::getVersion() << std::endl;
+std::cout << "VStabiliser class version: " << rapidpixel::VStabiliser::getVersion() << std::endl;
 ```
 
 Console output:
@@ -230,7 +227,7 @@ virtual bool initVStabiliser(const VStabiliserParams& params) = 0;
 The **setParam(...)** method changes video stabilizer parameter. The particular implementation of the video stabilizer must provide thread-safe **setParam(...)** method call. This means that the **setParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
-virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
+virtual bool setParam(rapidpixel::VStabiliserParam id, float value) = 0;
 ```
 
 | Parameter | Description                                                  |
@@ -247,7 +244,7 @@ virtual bool setParam(cr::vstab::VStabiliserParam id, float value) = 0;
 The **getParam(...)** method intended to get video stabilizer parameter value. The particular implementation of the video stabilizer must provide thread-safe **getParam(...)** method call. This means that the **getParam(...)** method can be safely called from any thread. Method declaration:
 
 ```cpp
-virtual float getParam(cr::vstab::VStabiliserParam id) = 0;
+virtual float getParam(rapidpixel::VStabiliserParam id) = 0;
 ```
 
 | Parameter | Description                                                  |
@@ -294,7 +291,7 @@ virtual bool executeCommand(VStabiliserCommand id, float value = 0.0f) = 0;
 The **stabilise(...)** method performs video stabilization. Method declaration:
 
 ```cpp
-virtual bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) = 0;
+virtual bool stabilise(rapidpixel::Frame& src, rapidpixel::Frame& dst) = 0;
 ```
 
 | Parameter | Description                                                  |
@@ -345,8 +342,8 @@ uint8_t data[11];
 // Size of encoded data.
 int size = 0;
 // Encode command.
-cr::vstab::VStabiliser::encodeSetParamCommand(
-        data, size, cr::vstab::VStabiliserParam::SCALE_FACTOR, 2.0f);
+rapidpixel::VStabiliser::encodeSetParamCommand(
+        data, size, rapidpixel::VStabiliserParam::SCALE_FACTOR, 2.0f);
 ```
 
 
@@ -374,8 +371,8 @@ uint8_t data[11];
 // Size of encoded data.
 int size = 0;
 // Encode command.
-cr::vstab::VStabiliser::encodeCommand(
-        data, size, cr::vstab::VStabiliserCommand::HOLD_MSEC, 1200.0f);
+rapidpixel::VStabiliser::encodeCommand(
+        data, size, rapidpixel::VStabiliserCommand::HOLD_MSEC, 1200.0f);
 ```
 
 
@@ -404,14 +401,14 @@ static int decodeCommand(uint8_t* data, int size, VStabiliserParam& paramId, VSt
 // Buffer for encoded data.
 uint8_t data[11];
 int size = 0;
-cr::vstab::VStabiliser::encodeCommand(
-        data, size, cr::vstab::VStabiliserCommand::ON);
+rapidpixel::VStabiliser::encodeCommand(
+        data, size, rapidpixel::VStabiliserCommand::ON);
 
 // Decode command.
-cr::vstab::VStabiliserCommand commandId = cr::vstab::VStabiliserCommand::RESET;
-cr::vstab::VStabiliserParam paramId = cr::vstab::VStabiliserParam::SCALE_FACTOR;
+rapidpixel::VStabiliserCommand commandId = rapidpixel::VStabiliserCommand::RESET;
+rapidpixel::VStabiliserParam paramId = rapidpixel::VStabiliserParam::SCALE_FACTOR;
 float value = 0.0f;
-if (cr::vstab::VStabiliser::decodeCommand(
+if (rapidpixel::VStabiliser::decodeCommand(
         data, size, paramId, commandId, value) != 0)
 {
     std::cout << "Command not decoded" << std::endl;
@@ -447,9 +444,7 @@ virtual bool decodeAndExecuteCommand(uint8_t* data, int size) = 0;
 **VStabiliserParam** enum lists video stabiliser parameters to set or to obtain. Enum declaration.
 
 ```cpp
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 enum class VStabiliserParam
 {
@@ -544,7 +539,6 @@ enum class VStabiliserParam
     CUSTOM_3
 };
 }
-}
 ```
 
 **Table 2** - Video stabiliser parameters description.
@@ -583,9 +577,7 @@ enum class VStabiliserParam
 **VStabiliserCommand** enum lists video stabiliser commands. Enum declaration.
 
 ```cpp
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 enum class VStabiliserCommand
 {
@@ -601,7 +593,6 @@ enum class VStabiliserCommand
     /// last value of the enum.
     HOLD_MSEC
 };
-}
 }
 ```
 
@@ -627,9 +618,7 @@ enum class VStabiliserCommand
 **VStabiliser.h** file contains **VStabiliserParams** class declaration. Class declaration:
 
 ```cpp
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 class VStabiliserParams
 {
@@ -734,7 +723,6 @@ public:
     bool decode(uint8_t* data, int dataSize);
 };
 }
-}
 ```
 
 **Table 4** - VStabiliserParams class fields description is equivalent to **VStabiliserParam** enum description.
@@ -790,9 +778,7 @@ bool encode(uint8_t* data, int bufferSize, int& size, VStabiliserParamsMask* mas
 **VStabiliserParamsMask** structure declaration:
 
 ```cpp
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 struct VStabiliserParamsMask
 {
@@ -822,14 +808,13 @@ struct VStabiliserParamsMask
     bool custom3{true};
 };
 }
-}
 ```
 
 Example without parameters mask:
 
 ```cpp
 // Encode data.
-cr::vstab::VStabiliserParams in;
+rapidpixel::VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
 if (!in.encode(data, 1024, size))
@@ -844,11 +829,11 @@ Example with parameters mask:
 
 ```cpp
 // Prepare mask. Exclude scaleFactor. Others by default.
-cr::vstab::VStabiliserParamsMask mask;
+rapidpixel::VStabiliserParamsMask mask;
 mask.scaleFactor = false;
 
 // Encode data.
-cr::vstab::VStabiliserParams in;
+rapidpixel::VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
 if (!in.encode(data, 1024, size, &mask))
@@ -880,7 +865,7 @@ Example:
 
 ```cpp
 // Encode data.
-cr::vstab::VStabiliserParams in;
+rapidpixel::VStabiliserParams in;
 uint8_t data[1024];
 int size = 0;
 if (!in.encode(data, 1024, size))
@@ -891,7 +876,7 @@ if (!in.encode(data, 1024, size))
 std::cout << "Encoded data size: " << size << " bytes" << std::endl;
 
 // Decode data.
-cr::vstab::VStabiliserParams out;
+rapidpixel::VStabiliserParams out;
 if (!out.decode(data, size))
 {
     std::cout << "Can't decode data" << std::endl;
@@ -907,7 +892,7 @@ if (!out.decode(data, size))
 
 ```cpp
 // Prepare params.
-cr::vstab::VStabiliserParams in;
+rapidpixel::VStabiliserParams in;
 in.scaleFactor = 2;
 in.xOffsetLimit = 100;
 in.yOffsetLimit = 80;
@@ -919,7 +904,7 @@ in.enable = false;
 in.fps = 25.0f;
 
 // Write params to file.
-cr::utils::ConfigReader inConfig;
+rapidpixel::ConfigReader inConfig;
 if (!inConfig.set(in, "VStabiliserParams") ||
     !inConfig.writeToFile("TestVStabiliserParams.json"))
 {
@@ -928,14 +913,14 @@ if (!inConfig.set(in, "VStabiliserParams") ||
 }
 
 // Read params from file.
-cr::utils::ConfigReader outConfig;
+rapidpixel::ConfigReader outConfig;
 if (!outConfig.readFromFile("TestVStabiliserParams.json"))
 {
     std::cout << "Can't open config file" << std::endl;
     return false;
 }
 
-cr::vstab::VStabiliserParams out;
+rapidpixel::VStabiliserParams out;
 if (!outConfig.get(out, "VStabiliserParams"))
 {
     std::cout << "Can't read params from file" << std::endl;
@@ -1181,7 +1166,7 @@ public:
     bool executeCommand(VStabiliserCommand id, float value = 0.0f) override;
 
     /// Stabilise video frame.
-    bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) override;
+    bool stabilise(rapidpixel::Frame& src, rapidpixel::Frame& dst) override;
 
     /// Get offsets: horizontal, vertical and rotation.
     void getOffsets(float& dX, float& dY, float& dA) override;

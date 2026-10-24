@@ -88,18 +88,18 @@ static_assert(COMMAND_VALUE_POS + VALUE_SIZE == COMMAND_SIZE,
 
 /// The lowest valid command ID.
 constexpr int COMMAND_ID_MIN{
-    static_cast<int>(cr::vstab::VStabiliserCommand::RESET)};
+    static_cast<int>(rapidpixel::VStabiliserCommand::RESET)};
 /// The highest valid command ID. An ID that is not in the range of the enum is
 /// rejected: the implementation must never get an unknown ID from the decoder.
 constexpr int COMMAND_ID_MAX{
-    static_cast<int>(cr::vstab::VStabiliserCommand::HOLD_MSEC)};
+    static_cast<int>(rapidpixel::VStabiliserCommand::HOLD_MSEC)};
 /// The lowest valid param ID.
 constexpr int PARAM_ID_MIN{
-    static_cast<int>(cr::vstab::VStabiliserParam::SCALE_FACTOR)};
+    static_cast<int>(rapidpixel::VStabiliserParam::SCALE_FACTOR)};
 /// The highest valid param ID. An ID that is not in the range of the enum is
 /// rejected.
 constexpr int PARAM_ID_MAX{
-    static_cast<int>(cr::vstab::VStabiliserParam::CUSTOM_3)};
+    static_cast<int>(rapidpixel::VStabiliserParam::CUSTOM_3)};
 
 
 
@@ -117,7 +117,7 @@ struct FieldRef
 /// Get the table of VStabiliserParams fields in the order they are stored in
 /// the encoded data (the same order as the bits of the mask).
 std::array<FieldRef, FIELDS_NUMBER> makeFieldTable(
-        cr::vstab::VStabiliserParams& params)
+        rapidpixel::VStabiliserParams& params)
 {
     return {{
         {&params.scaleFactor, VALUE_SIZE},
@@ -151,7 +151,7 @@ std::array<FieldRef, FIELDS_NUMBER> makeFieldTable(
 
 /// Get the flags of the params mask in the same order as the table of fields.
 std::array<bool, FIELDS_NUMBER> makeMaskFlags(
-        const cr::vstab::VStabiliserParamsMask& mask)
+        const rapidpixel::VStabiliserParamsMask& mask)
 {
     return {{
         mask.scaleFactor,
@@ -241,20 +241,20 @@ void encodeCommandData(
 
 
 
-cr::vstab::VStabiliser::~VStabiliser() = default;
+rapidpixel::VStabiliser::~VStabiliser() = default;
 
 
 
-std::string cr::vstab::VStabiliser::getVersion()
+std::string rapidpixel::VStabiliser::getVersion()
 {
     return VSTABILISER_VERSION;
 }
 
 
 
-bool cr::vstab::VStabiliserParams::encode(
+bool rapidpixel::VStabiliserParams::encode(
         uint8_t* data, int bufferSize, int& size,
-        cr::vstab::VStabiliserParamsMask* mask)
+        rapidpixel::VStabiliserParamsMask* mask)
 {
     // The size is 0 if params are not encoded.
     size = 0;
@@ -317,7 +317,7 @@ bool cr::vstab::VStabiliserParams::encode(
 
 
 
-bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
+bool rapidpixel::VStabiliserParams::decode(uint8_t* data, int dataSize)
 {
     // Check the pointer and the size (the header must be complete).
     if (data == nullptr || dataSize < PARAMS_HEADER_SIZE)
@@ -376,8 +376,8 @@ bool cr::vstab::VStabiliserParams::decode(uint8_t* data, int dataSize)
 
 
 
-void cr::vstab::VStabiliser::encodeSetParamCommand(
-        uint8_t* data, int& size, cr::vstab::VStabiliserParam id, float value)
+void rapidpixel::VStabiliser::encodeSetParamCommand(
+        uint8_t* data, int& size, rapidpixel::VStabiliserParam id, float value)
 {
     encodeCommandData(data, size, SET_PARAM_DATA_TYPE,
                       static_cast<int>(id), value);
@@ -385,8 +385,8 @@ void cr::vstab::VStabiliser::encodeSetParamCommand(
 
 
 
-void cr::vstab::VStabiliser::encodeCommand(
-        uint8_t* data, int& size, cr::vstab::VStabiliserCommand id,
+void rapidpixel::VStabiliser::encodeCommand(
+        uint8_t* data, int& size, rapidpixel::VStabiliserCommand id,
         float value)
 {
     encodeCommandData(data, size, COMMAND_DATA_TYPE,
@@ -395,9 +395,9 @@ void cr::vstab::VStabiliser::encodeCommand(
 
 
 
-int cr::vstab::VStabiliser::decodeCommand(
-        uint8_t* data, int size, cr::vstab::VStabiliserParam& paramId,
-        cr::vstab::VStabiliserCommand& commandId, float& value)
+int rapidpixel::VStabiliser::decodeCommand(
+        uint8_t* data, int size, rapidpixel::VStabiliserParam& paramId,
+        rapidpixel::VStabiliserCommand& commandId, float& value)
 {
     // Check the pointer and the size. Commands of both types have the same
     // fixed size, so any other size is an error.

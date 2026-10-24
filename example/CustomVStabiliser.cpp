@@ -108,120 +108,120 @@ bool assignFlag(bool& target, float value)
 
 /// Set one param of the params object. The object is not changed if the value
 /// is not valid for the param.
-bool setParamValue(cr::vstab::VStabiliserParams& params,
-                   cr::vstab::VStabiliserParam id, float value)
+bool setParamValue(rapidpixel::VStabiliserParams& params,
+                   rapidpixel::VStabiliserParam id, float value)
 {
     switch (id)
     {
-    case cr::vstab::VStabiliserParam::SCALE_FACTOR:
+    case rapidpixel::VStabiliserParam::SCALE_FACTOR:
     {
         return assignInt(params.scaleFactor, value,
                          MIN_SCALE_FACTOR, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::X_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::X_OFFSET_LIMIT:
     {
         return assignInt(params.xOffsetLimit, value, 0, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::Y_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::Y_OFFSET_LIMIT:
     {
         return assignInt(params.yOffsetLimit, value, 0, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::A_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::A_OFFSET_LIMIT:
     {
         return assignFloat(params.aOffsetLimit, value, 0.0f, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::X_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::X_FILTER_COEFF:
     {
         return assignFloat(params.xFilterCoeff, value,
                            MIN_FILTER_COEFF, MAX_FILTER_COEFF);
     }
-    case cr::vstab::VStabiliserParam::Y_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::Y_FILTER_COEFF:
     {
         return assignFloat(params.yFilterCoeff, value,
                            MIN_FILTER_COEFF, MAX_FILTER_COEFF);
     }
-    case cr::vstab::VStabiliserParam::A_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::A_FILTER_COEFF:
     {
         return assignFloat(params.aFilterCoeff, value,
                            MIN_FILTER_COEFF, MAX_FILTER_COEFF);
     }
-    case cr::vstab::VStabiliserParam::MODE:
+    case rapidpixel::VStabiliserParam::MODE:
     {
         return assignFlag(params.enable, value);
     }
-    case cr::vstab::VStabiliserParam::TRANSPARENT_BORDER:
+    case rapidpixel::VStabiliserParam::TRANSPARENT_BORDER:
     {
         return assignFlag(params.transparentBorder, value);
     }
-    case cr::vstab::VStabiliserParam::CONST_X_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_X_OFFSET:
     {
         return assignInt(params.constXOffset, value,
                          -INT_MAX_VALUE, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::CONST_Y_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_Y_OFFSET:
     {
         return assignInt(params.constYOffset, value,
                          -INT_MAX_VALUE, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::CONST_A_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_A_OFFSET:
     {
         return assignFloat(params.constAOffset, value,
                            -FLOAT_MAX_VALUE, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::INSTANT_X_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_X_OFFSET:
     {
         return assignInt(params.instantXOffset, value,
                          -INT_MAX_VALUE, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::INSTANT_Y_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_Y_OFFSET:
     {
         return assignInt(params.instantYOffset, value,
                          -INT_MAX_VALUE, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::INSTANT_A_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_A_OFFSET:
     {
         return assignFloat(params.instantAOffset, value,
                            -FLOAT_MAX_VALUE, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::TYPE:
+    case rapidpixel::VStabiliserParam::TYPE:
     {
         return assignInt(params.type, value, 0, MAX_TYPE);
     }
-    case cr::vstab::VStabiliserParam::CUT_FREQUENCY_HZ:
+    case rapidpixel::VStabiliserParam::CUT_FREQUENCY_HZ:
     {
         return assignFloat(params.cutFrequencyHz, value,
                            0.0f, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::FPS:
+    case rapidpixel::VStabiliserParam::FPS:
     {
         return assignFloat(params.fps, value,
                            FLOAT_MIN_POSITIVE, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::PROCESSING_TIME_MKS:
+    case rapidpixel::VStabiliserParam::PROCESSING_TIME_MKS:
     {
         // Read only parameter.
         return false;
     }
-    case cr::vstab::VStabiliserParam::LOG_MODE:
+    case rapidpixel::VStabiliserParam::LOG_MODE:
     {
         return assignInt(params.logMod, value, 0, MAX_LOG_MODE);
     }
-    case cr::vstab::VStabiliserParam::BACKEND:
+    case rapidpixel::VStabiliserParam::BACKEND:
     {
         return assignInt(params.backend, value,
                          -INT_MAX_VALUE, INT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_1:
+    case rapidpixel::VStabiliserParam::CUSTOM_1:
     {
         return assignFloat(params.custom1, value,
                            -FLOAT_MAX_VALUE, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_2:
+    case rapidpixel::VStabiliserParam::CUSTOM_2:
     {
         return assignFloat(params.custom2, value,
                            -FLOAT_MAX_VALUE, FLOAT_MAX_VALUE);
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_3:
+    case rapidpixel::VStabiliserParam::CUSTOM_3:
     {
         return assignFloat(params.custom3, value,
                            -FLOAT_MAX_VALUE, FLOAT_MAX_VALUE);
@@ -237,7 +237,7 @@ bool setParamValue(cr::vstab::VStabiliserParams& params,
 
 /// Check that all values of the params object are valid. The ranges are the
 /// same as in setParamValue(...).
-bool isValid(const cr::vstab::VStabiliserParams& params)
+bool isValid(const rapidpixel::VStabiliserParams& params)
 {
     return inRange(params.scaleFactor, MIN_SCALE_FACTOR, INT_MAX_VALUE) &&
            inRange(params.xOffsetLimit, 0, INT_MAX_VALUE) &&
@@ -266,23 +266,23 @@ bool isValid(const cr::vstab::VStabiliserParams& params)
 
 
 
-cr::vstab::CustomVStabiliser::CustomVStabiliser() = default;
+rapidpixel::CustomVStabiliser::CustomVStabiliser() = default;
 
 
 
-cr::vstab::CustomVStabiliser::~CustomVStabiliser() = default;
+rapidpixel::CustomVStabiliser::~CustomVStabiliser() = default;
 
 
 
-std::string cr::vstab::CustomVStabiliser::getVersion()
+std::string rapidpixel::CustomVStabiliser::getVersion()
 {
     return CUSTOM_VSTABILISER_VERSION;
 }
 
 
 
-bool cr::vstab::CustomVStabiliser::initVStabiliser(
-        const cr::vstab::VStabiliserParams& params)
+bool rapidpixel::CustomVStabiliser::initVStabiliser(
+        const rapidpixel::VStabiliserParams& params)
 {
     // Check params: they are copied only if all values are valid.
     if (!isValid(params))
@@ -299,8 +299,8 @@ bool cr::vstab::CustomVStabiliser::initVStabiliser(
 
 
 
-bool cr::vstab::CustomVStabiliser::setParam(
-        cr::vstab::VStabiliserParam id, float value)
+bool rapidpixel::CustomVStabiliser::setParam(
+        rapidpixel::VStabiliserParam id, float value)
 {
     const std::lock_guard<std::mutex> lock(m_paramsMutex);
     return setParamValue(m_params, id, value);
@@ -308,106 +308,106 @@ bool cr::vstab::CustomVStabiliser::setParam(
 
 
 
-float cr::vstab::CustomVStabiliser::getParam(cr::vstab::VStabiliserParam id)
+float rapidpixel::CustomVStabiliser::getParam(rapidpixel::VStabiliserParam id)
 {
     const std::lock_guard<std::mutex> lock(m_paramsMutex);
 
     // Check parameter ID.
     switch (id)
     {
-    case cr::vstab::VStabiliserParam::SCALE_FACTOR:
+    case rapidpixel::VStabiliserParam::SCALE_FACTOR:
     {
         return static_cast<float>(m_params.scaleFactor);
     }
-    case cr::vstab::VStabiliserParam::X_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::X_OFFSET_LIMIT:
     {
         return static_cast<float>(m_params.xOffsetLimit);
     }
-    case cr::vstab::VStabiliserParam::Y_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::Y_OFFSET_LIMIT:
     {
         return static_cast<float>(m_params.yOffsetLimit);
     }
-    case cr::vstab::VStabiliserParam::A_OFFSET_LIMIT:
+    case rapidpixel::VStabiliserParam::A_OFFSET_LIMIT:
     {
         return m_params.aOffsetLimit;
     }
-    case cr::vstab::VStabiliserParam::X_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::X_FILTER_COEFF:
     {
         return m_params.xFilterCoeff;
     }
-    case cr::vstab::VStabiliserParam::Y_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::Y_FILTER_COEFF:
     {
         return m_params.yFilterCoeff;
     }
-    case cr::vstab::VStabiliserParam::A_FILTER_COEFF:
+    case rapidpixel::VStabiliserParam::A_FILTER_COEFF:
     {
         return m_params.aFilterCoeff;
     }
-    case cr::vstab::VStabiliserParam::MODE:
+    case rapidpixel::VStabiliserParam::MODE:
     {
         return m_params.enable ? 1.0f : 0.0f;
     }
-    case cr::vstab::VStabiliserParam::TRANSPARENT_BORDER:
+    case rapidpixel::VStabiliserParam::TRANSPARENT_BORDER:
     {
         return m_params.transparentBorder ? 1.0f : 0.0f;
     }
-    case cr::vstab::VStabiliserParam::CONST_X_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_X_OFFSET:
     {
         return static_cast<float>(m_params.constXOffset);
     }
-    case cr::vstab::VStabiliserParam::CONST_Y_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_Y_OFFSET:
     {
         return static_cast<float>(m_params.constYOffset);
     }
-    case cr::vstab::VStabiliserParam::CONST_A_OFFSET:
+    case rapidpixel::VStabiliserParam::CONST_A_OFFSET:
     {
         return m_params.constAOffset;
     }
-    case cr::vstab::VStabiliserParam::INSTANT_X_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_X_OFFSET:
     {
         return static_cast<float>(m_params.instantXOffset);
     }
-    case cr::vstab::VStabiliserParam::INSTANT_Y_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_Y_OFFSET:
     {
         return static_cast<float>(m_params.instantYOffset);
     }
-    case cr::vstab::VStabiliserParam::INSTANT_A_OFFSET:
+    case rapidpixel::VStabiliserParam::INSTANT_A_OFFSET:
     {
         return m_params.instantAOffset;
     }
-    case cr::vstab::VStabiliserParam::TYPE:
+    case rapidpixel::VStabiliserParam::TYPE:
     {
         return static_cast<float>(m_params.type);
     }
-    case cr::vstab::VStabiliserParam::CUT_FREQUENCY_HZ:
+    case rapidpixel::VStabiliserParam::CUT_FREQUENCY_HZ:
     {
         return m_params.cutFrequencyHz;
     }
-    case cr::vstab::VStabiliserParam::FPS:
+    case rapidpixel::VStabiliserParam::FPS:
     {
         return m_params.fps;
     }
-    case cr::vstab::VStabiliserParam::PROCESSING_TIME_MKS:
+    case rapidpixel::VStabiliserParam::PROCESSING_TIME_MKS:
     {
         return static_cast<float>(m_params.processingTimeMks);
     }
-    case cr::vstab::VStabiliserParam::LOG_MODE:
+    case rapidpixel::VStabiliserParam::LOG_MODE:
     {
         return static_cast<float>(m_params.logMod);
     }
-    case cr::vstab::VStabiliserParam::BACKEND:
+    case rapidpixel::VStabiliserParam::BACKEND:
     {
         return static_cast<float>(m_params.backend);
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_1:
+    case rapidpixel::VStabiliserParam::CUSTOM_1:
     {
         return m_params.custom1;
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_2:
+    case rapidpixel::VStabiliserParam::CUSTOM_2:
     {
         return m_params.custom2;
     }
-    case cr::vstab::VStabiliserParam::CUSTOM_3:
+    case rapidpixel::VStabiliserParam::CUSTOM_3:
     {
         return m_params.custom3;
     }
@@ -420,8 +420,8 @@ float cr::vstab::CustomVStabiliser::getParam(cr::vstab::VStabiliserParam id)
 
 
 
-void cr::vstab::CustomVStabiliser::getParams(
-        cr::vstab::VStabiliserParams& params)
+void rapidpixel::CustomVStabiliser::getParams(
+        rapidpixel::VStabiliserParams& params)
 {
     const std::lock_guard<std::mutex> lock(m_paramsMutex);
     params = m_params;
@@ -429,31 +429,31 @@ void cr::vstab::CustomVStabiliser::getParams(
 
 
 
-bool cr::vstab::CustomVStabiliser::executeCommand(
-        cr::vstab::VStabiliserCommand id, float value)
+bool rapidpixel::CustomVStabiliser::executeCommand(
+        rapidpixel::VStabiliserCommand id, float value)
 {
     const std::lock_guard<std::mutex> lock(m_paramsMutex);
 
     // Check command ID.
     switch (id)
     {
-    case cr::vstab::VStabiliserCommand::RESET:
+    case rapidpixel::VStabiliserCommand::RESET:
     {
         return true;
     }
-    case cr::vstab::VStabiliserCommand::ON:
+    case rapidpixel::VStabiliserCommand::ON:
     {
         // After the command the param MODE must be 1.
         m_params.enable = true;
         return true;
     }
-    case cr::vstab::VStabiliserCommand::OFF:
+    case rapidpixel::VStabiliserCommand::OFF:
     {
         // After the command the param MODE must be 0.
         m_params.enable = false;
         return true;
     }
-    case cr::vstab::VStabiliserCommand::HOLD_MSEC:
+    case rapidpixel::VStabiliserCommand::HOLD_MSEC:
     {
         // The argument is the time in milliseconds.
         return inRange(value, 0.0f, FLOAT_MAX_VALUE);
@@ -467,8 +467,8 @@ bool cr::vstab::CustomVStabiliser::executeCommand(
 
 
 
-bool cr::vstab::CustomVStabiliser::stabilise(
-        cr::video::Frame& src, cr::video::Frame& dst)
+bool rapidpixel::CustomVStabiliser::stabilise(
+        rapidpixel::Frame& src, rapidpixel::Frame& dst)
 {
     // Copy frame.
     dst = src;
@@ -478,7 +478,7 @@ bool cr::vstab::CustomVStabiliser::stabilise(
 
 
 
-void cr::vstab::CustomVStabiliser::getOffsets(float& dX, float& dY, float& dA)
+void rapidpixel::CustomVStabiliser::getOffsets(float& dX, float& dY, float& dA)
 {
     const std::lock_guard<std::mutex> lock(m_paramsMutex);
     dX = static_cast<float>(m_params.instantXOffset);
@@ -488,7 +488,7 @@ void cr::vstab::CustomVStabiliser::getOffsets(float& dX, float& dY, float& dA)
 
 
 
-bool cr::vstab::CustomVStabiliser::decodeAndExecuteCommand(
+bool rapidpixel::CustomVStabiliser::decodeAndExecuteCommand(
         uint8_t* data, int size)
 {
     // Decode command. The decoder checks the size, the version and the IDs.

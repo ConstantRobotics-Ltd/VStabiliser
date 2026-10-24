@@ -8,9 +8,7 @@
 
 
 
-namespace cr
-{
-namespace vstab
+namespace rapidpixel
 {
 /**
  * @brief Custom video stabiliser class.
@@ -108,7 +106,7 @@ public:
      * @param dst Result video frame.
      * @return TRUE if video frame processed or FALSE in case any errors.
      */
-    bool stabilise(cr::video::Frame& src, cr::video::Frame& dst) override;
+    bool stabilise(rapidpixel::Frame& src, rapidpixel::Frame& dst) override;
 
     /**
      * @brief Get offsets: horizontal, vertical and rotation.
@@ -133,5 +131,4 @@ private:
     /// Mutex to protect m_params.
     std::mutex m_paramsMutex;
 };
-}
 }
