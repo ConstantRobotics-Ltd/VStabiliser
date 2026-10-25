@@ -57,19 +57,19 @@
 | Version | Release date | What's new                                                   |
 | ------- | ------------ | ------------------------------------------------------------ |
 | 1.0.0   | 18.05.2023   | First version.                                               |
-| 2.0.0   | 11.07.2023   | - Added VStabiliserParams class to keep library parameters.<br />- Added method to encode/decode commands.<br />- Added test application.<br />- Added license.<br />- Repository made public. |
+| 2.0.0   | 11.07.2023   | - Added VStabiliserParams class to keep library parameters.<br />- Added method to encode/decode commands.<br />- Added test application.<br />- Repository made public. |
 | 2.0.1   | 12.07.2023   | - Fixed typo in VStabiliserParams<br />- Updated test application. |
 | 2.1.0   | 30.07.2023   | - Switched from radians to radians in params.                |
 | 2.2.0   | 24.07.2023   | - Updated encode(...) and decode(...) methods of VStabiliserParams.<br />- Added decodeAndExecuteCommand(...) method.<br />- Added example of video stabiliser implementation. |
 | 2.3.0   | 26.09.2023   | - Signature of getParams(...) method changed.                |
 | 2.3.1   | 13.11.2023   | - Frame class updated.                                       |
 | 2.4.1   | 14.12.2023   | - Virtual destructor added.<br />- Frame class updated.      |
-| 2.4.2   | 04.01.2024   | - GitHub compliant license added.                            |
+| 2.4.2   | 04.01.2024   | - Repository files updated.                                  |
 | 2.4.3   | 25.03.2024   | - Frame class updated.<br />- ConfigReader class updated.<br />- Documentation updated. |
 | 2.4.4   | 25.07.2024   | - CMake structure updated.                                   |
 | 2.5.0   | 29.09.2024   | - Add new HOLD_MSEC action command.<br/>- Change signature of encodeCommand(...) method and executeCommand(...) method. |
 | 2.6.0   | 16.04.2025   | - Add new parameters.                                        |
-| 2.6.1   | 19.10.2026   | - Git submodules removed: the Frame and ConfigReader libraries are expected in the folders next to the library repository (stand alone build) or must be added by the parent project.<br />- License file removed.<br />- Serialization of VStabiliserParams and of the commands rewritten (the encoded data is the same).<br />- decode(...) of VStabiliserParams changes the object only if the whole data is valid.<br />- decodeCommand(...) checks the exact size of the command (11 bytes), the range of the command and param IDs and returns -1 for a SET_PARAM command of a wrong size (it returned 0).<br />- encode(...), decode(...), encodeCommand(...), encodeSetParamCommand(...) and decodeCommand(...) reject nullptr; encode(...) sets size to 0 if params are not encoded.<br />- Protected default, copy and move special member functions added to VStabiliser class.<br />- Example: implements all methods of the interface (initVStabiliser(...) had a different signature), is thread-safe and validates values.<br />- Test application rewritten: deterministic, leaves no files, returns non-zero code on errors.<br />- Compiler warnings and hardening options added to the CMake files.<br />- Documentation updated. |
+| 2.6.1   | 19.10.2026   | - Git submodules removed: the Frame and ConfigReader libraries are expected in the folders next to the library repository (stand alone build) or must be added by the parent project.<br />- Serialization of VStabiliserParams and of the commands rewritten (the encoded data is the same).<br />- decode(...) of VStabiliserParams changes the object only if the whole data is valid.<br />- decodeCommand(...) checks the exact size of the command (11 bytes), the range of the command and param IDs and returns -1 for a SET_PARAM command of a wrong size (it returned 0).<br />- encode(...), decode(...), encodeCommand(...), encodeSetParamCommand(...) and decodeCommand(...) reject nullptr; encode(...) sets size to 0 if params are not encoded.<br />- Protected default, copy and move special member functions added to VStabiliser class.<br />- Example: implements all methods of the interface (initVStabiliser(...) had a different signature), is thread-safe and validates values.<br />- Test application rewritten: deterministic, leaves no files, returns non-zero code on errors.<br />- Compiler warnings and hardening options added to the CMake files.<br />- Documentation updated. |
 
 
 # Library files
