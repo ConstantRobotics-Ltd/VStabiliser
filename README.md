@@ -965,7 +965,7 @@ if (!outConfig.get(out, "VStabiliserParams"))
 
 ## Build stand alone
 
-The repository does not contain sub-repositories. The libraries **VStabiliser** depends on (**Frame** and **ConfigReader**) must be cloned into the same folder as **VStabiliser**. The folder structure must be:
+The repository does not contain sub-repositories. The libraries **VStabiliser** depends on (**Frame** and **ConfigReader**) must be placed in the same folder as **VStabiliser**: copy their folders, for example from the folder **modules** of the RapidPixel SDK. The folder structure must be:
 
 ```bash
 <work folder>
@@ -974,12 +974,9 @@ The repository does not contain sub-repositories. The libraries **VStabiliser** 
     ConfigReader
 ```
 
-Typical commands to build the library, the test application and the example (use the URLs of the repositories provided to you):
+Typical commands to build the library, the test application and the example:
 
 ```bash
-git clone <VStabiliser repository URL>
-git clone <Frame repository URL>
-git clone <ConfigReader repository URL>
 cd VStabiliser
 mkdir build
 cd build
@@ -1017,7 +1014,7 @@ src
     yourLib.cpp
 ```
 
-Create folder **3rdparty** in your repository folder and copy **VStabiliser**, **Frame** and **ConfigReader** repository folders there. Structure of your repository:
+Create folder **3rdparty** in your repository and copy the folders of the libraries **Frame**, **ConfigReader** and **VStabiliser** there (for example from the folder **modules** of the RapidPixel SDK). Structure of your repository:
 
 ```bash
 CMakeLists.txt
