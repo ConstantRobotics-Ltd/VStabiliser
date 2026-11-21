@@ -4,7 +4,7 @@
 
 # **VStabiliser interface C++ library**
 
-**v2.6.1**
+**v2.6.2**
 
 
 
@@ -72,6 +72,7 @@
 | 2.5.0   | 29.09.2024   | - Add new HOLD_MSEC action command.<br/>- Change signature of encodeCommand(...) method and executeCommand(...) method. |
 | 2.6.0   | 16.04.2025   | - Add new parameters.                                        |
 | 2.6.1   | 19.10.2026   | - Git submodules removed: the Frame and ConfigReader libraries are expected in the folders next to the library repository (stand alone build) or must be added by the parent project.<br />- Serialization of VStabiliserParams and of the commands rewritten (the encoded data is the same).<br />- decode(...) of VStabiliserParams changes the object only if the whole data is valid.<br />- decodeCommand(...) checks the exact size of the command (11 bytes), the range of the command and param IDs and returns -1 for a SET_PARAM command of a wrong size (it returned 0).<br />- encode(...), decode(...), encodeCommand(...), encodeSetParamCommand(...) and decodeCommand(...) reject nullptr; encode(...) sets size to 0 if params are not encoded.<br />- Protected default, copy and move special member functions added to VStabiliser class.<br />- Example: implements all methods of the interface (initVStabiliser(...) had a different signature), is thread-safe and validates values.<br />- Test application rewritten: deterministic, leaves no files, returns non-zero code on errors.<br />- Compiler warnings and hardening options added to the CMake files.<br />- Documentation updated. |
+| 2.6.2   | 21.11.2026   | - CMake: hardening flags are checked with -Werror, the build with Clang 15 for AArch64 has no warnings. |
 
 
 # Library files
@@ -203,7 +204,7 @@ std::cout << "VStabiliser class version: " << rapidpixel::VStabiliser::getVersio
 Console output:
 
 ```bash
-VStabiliser class version: 2.6.1
+VStabiliser class version: 2.6.2
 ```
 
 
